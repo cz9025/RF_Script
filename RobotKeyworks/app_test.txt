@@ -1,0 +1,14 @@
+*** Settings ***
+Library           AppiumLibrary
+Library           Selenium2Library
+Library           BuiltIn
+
+*** Test Cases ***
+连接手机测试
+    Open Application    http://localhost:4723/wd/hub    platformName=Android    platformVersion=5.1.1    deviceName=6R2QAX1452004560    app=${CURDIR}/Golf.apk    appPackage=com.tentinet.golf
+    ...    appActivity=MainActivity    #Open Application    http://localhost:4723/wd/hub    platformName=Android    platformVersion=5.1.1    deviceName=6R2QAX1452004560
+    ...    # app=${CURDIR}/ContactManager.apk    appPackage=com.tentinet.xianqianbao    # appActivity=com.tentinet.xianqianbao.LoginActivity
+    Sleep    3
+    Remove Application    com.tentinet.golf
+    #重复执行关键字
+    #Repeat Keyword

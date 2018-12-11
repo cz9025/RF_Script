@@ -1,0 +1,132 @@
+*** Settings ***
+Library           String
+
+*** Test Cases ***
+Catenate连接符
+    #将2个字符串连接在一起    中间有空格
+    ${str1}    Catenate    hello    world
+    log    ${str1}
+    #将2个字符串连接在一起    中间没有空格
+    ${str2}    Catenate    SEPARATOR=    HELLO    world
+    log    ${str2}
+    #将2个字符串中间加连接符
+    ${str3}    Catenate    SEPARATOR=---    HELLO    world
+    log    ${str3}
+    #注释
+    Comment    1234
+
+Continue For Loop使用
+    @{li}    Create List    1    2    3
+    : FOR    ${var}    IN    @{li}
+    \    #下一个值如果是    '${var}'=='3'    则执行下面的语句    跟下面那个用法不一样
+    \    Run Keyword If    '${var}'=='2'    Continue For Loop
+    \    log    12
+    log    123456789
+    : FOR    ${var}    IN    @{li}
+    \    #下一个值如果是    '${var}'=='3'    则执行下面的语句
+    \    Continue For Loop If    '${var}'=='3'
+    \    log    ${var}
+    : FOR    ${var}    IN    1    3
+    \    log    111:::${var}
+
+Convert转换
+    #转换为二进制
+    ${result}    Convert To Binary    12    10    #12为十进制
+    log    ${result}
+    ${result}    Convert To Binary    12    8    #12为八进制
+    log    ${result}
+    ${result}    Convert To Binary    ab    16    #ab为16进制
+    log    ${result}
+    #转换为十六进制
+    ${res}    Convert To Hex    255
+    #转换为十进制
+    ${res}    Convert To Integer    1001    2    #将1001的二进制转为10进制
+    #转换为八进制
+    ${res}    Convert To Octal    1234
+    ${res}    Convert To Octal    1234    16    #将1234的十六进制转换为八进制
+    #转换为布尔值
+    ${res}    Convert To Boolean    1
+    #转换为字节
+    ${res}    Convert To Bytes    65 97    int    #Aa
+    ${res}    Convert To Bytes    0010 1001    bin
+    #转换为数字
+    ${res}    Convert To Number    12345.876543    2    #2为保留2位小叔
+    ${res}    Convert To Number    12345.876543    -1    #12350#转换为整十的数
+    #转换为字符串
+    ${res}    Convert To String    dss23s
+
+Dict--List
+    ${dict}    Create Dictionary    a=1    b=2    c=3
+    log    ${dict}
+    log    ${dict.a}
+    Should Be Equal    ${dict.a}    1
+    @{list}    Create List    a    b    c
+    Log Many    @{list}
+    : FOR    ${var}    IN    @{list}
+    \    log    ${var}
+
+Exit For Loop退出
+    #循环到指定条件时退出
+    @{list}    Create List    1    2    3    4
+    : FOR    ${var}    IN    @{list}
+    \    Run Keyword If    ${var}==3    Exit For Loop
+    \    log    ${var}
+    log    =====================
+    : FOR    ${var}    IN    @{list}
+    \    Exit For Loop If    ${var}==3
+    \    log    ${var}
+    #Fail    \ 出错来    t
+    Fatal Error    \ 出错
+
+Get获取
+    #获得某个值在列表中的个数
+    ${a}    Create List    a    a    c    d
+    ${count}    Get Count    ${a}    a
+    log    ${count}
+    #获取一个列表的长度
+    ${len}    Get Length    ${a}
+    log    ${len}
+    #日期时间
+    ${time}    Get Time
+    #时间转换为毫秒
+    ${sec}    Get Time    epoch
+    ${year}    Get Time    return year
+    ${yyyy}    ${mm}    ${dd}    Get Time    year,month,day
+    ${time}    Get Time    year month day \ hour min sec
+    ${x}    Get Variable Value    ${a}    default
+    #No Operation
+    ${year}    Get Time    year    NOW
+    ${month}    Get Time    month    NOW
+    ${day}    Get Time    day    NOW+48h
+    ${end}    Set Variable    ${year}-${month}-${day} 10:10:10
+    log    ${end}
+    ${t}    Get Time
+    log    ${t}
+
+Pass通过
+    #到达指定条件退出    通过退出
+    @{list}    Create List    a    b    c    d
+    : FOR    ${var}    IN    @{list}
+    \    Run Keyword If    '${var}'=='b'    Pass Execution    OK
+    \    log    ${var}
+    : FOR    ${var}    IN    @{list}
+    \    Pass Execution If    '${var}'=='b'    OK
+    \    log    ${var}
+
+R开头系列
+    #    转移字母或数字外的字符
+    ${hh}    Regexp Escape    开始
+    log    ${hh}
+    #该语句错了还是会执行下面的语句
+    Run Keyword And Continue On Failure    Should Be String    123457
+    log    竟然执行了
+    ${li}    Create List    a
+    ${aaa}    Run Keyword And Return Status    Should Be Empty    ${li}
+    log    ${aaa}
+    ${aa}    Run Keyword And Return Status    log    li:${loi}
+    log    ${aa}
+
+字符串比较
+    ${a}    Set Variable    qwertyu
+    ${b}    Set Variable    qwertyu
+    Should Be Equal As Strings    ${a}    ${b}

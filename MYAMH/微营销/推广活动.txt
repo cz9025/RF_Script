@@ -1,0 +1,654 @@
+*** Settings ***
+Suite Setup       登录
+Suite Teardown    关闭浏览器
+Test Teardown     失败重启
+Resource          ../Resource/常用操作.robot
+Resource          ../Resource/配置参数.robot
+
+*** Test Cases ***
+众筹活动-添加
+    ####进入页面
+    点击菜单链接    微营销
+    Wait Until Page Contains Element    //*[@id="breadcrumbs"]/ul/li    #等待 ‘秒杀活动管理’ 显示
+    ${sub}    Set Variable    众筹活动
+    点击菜单链接    ${sub}
+    Sleep    3
+    点击菜单链接    添加点赞众筹
+    Wait Until Page Contains Element    //*[@id="breadcrumbs"]/ul/li    #等待 ‘众筹活动’ 显示
+    ##输入图文标题
+    ${标题}    随机字符    【众筹活动】    12
+    Input Text    //*[@id="home"]/div[2]/form/div[1]/div/input    ${标题}
+    Sleep    1
+    ###摘要内容
+    ${内容}    Generate Random String    50
+    Input Text    //*[@id="form-field-8"]    ${内容}
+    Sleep    1
+    ##活动图片
+    Click Element    //*[@id="home"]/div[2]/form/div[3]/div/div/a/label/span
+    Wait Until Page Contains Element    //h4[text()="图片管理器"]
+    ${count}    Get Matching Xpath Count    //*[@id="select_ajax_form"]/div[3]/div/ul/li    #算出当前图片总数
+    ${rand}    Evaluate    random.randint(1, ${count})    modules=random
+    Sleep    2
+    Click Element    //*[@id="select_ajax_form"]/div[3]/div/ul/li[${rand}]/a/img
+    Sleep    2
+    #确定
+    Click Element    id=submitImage
+    Sleep    2
+    #下一步
+    Click Element    //*[@id="btnConfirm"]
+    Sleep    3
+    #活动名称
+    Input Text    //*[@id="rule"]/form/div[1]/div/input    ${标题}
+    #活动时间
+    ${start}    Get Time
+    ${year}    Get Time    year    NOW
+    ${month}    Get Time    month    NOW
+    ${day}    Get Time    day    NOW+48h
+    ${end}    Set Variable    ${year}-${month}-${day} 10:10:10
+    log    ${end}
+    #开始时间
+    Input Text    //*[@id="start_time"]    ${start}
+    Sleep    2
+    #结束时间
+    Input Text    //*[@id="end_time"]    ${end}
+    #其他地方点击下，隐藏时间
+    Click Element    //*[@id="rule"]/form/div[1]/div/input
+    #奖品来源
+    Select From List By Value    //*[@id="rule"]/form/div[3]/div/select    1
+    #参加活动商品
+    选择商品    //*[@id="rule"]/form/div[5]/div/div[1]/a
+    Sleep    2
+    #保存并关闭
+    Click Element    //*[@id="saveBtn"]
+    Sleep    2
+    弹框校验
+    #开启状态
+    Wait Until Page Contains Element    //*[@id="breadcrumbs"]/ul/li    #等待 ‘秒杀活动管理’ 显示
+    Click Element    //*[@id="main-container"]/div[1]/div[2]/div[2]/div/div/div[3]/table/tbody/tr[1]/td[6]/label/input
+    Sleep    3
+    #弹框校验    开启
+
+众筹活动-添加2
+    ####进入页面
+    点击菜单链接    微营销
+    Wait Until Page Contains Element    //*[@id="breadcrumbs"]/ul/li    #等待 ‘秒杀活动管理’ 显示
+    ${sub}    Set Variable    众筹活动
+    点击菜单链接    ${sub}
+    Sleep    3
+    点击菜单链接    添加点赞众筹
+    Wait Until Page Contains Element    //*[@id="breadcrumbs"]/ul/li    #等待 ‘众筹活动’ 显示
+    ##输入图文标题
+    ${标题}    随机字符    【众筹活动】    12
+    Input Text    //*[@id="home"]/div[2]/form/div[1]/div/input    ${标题}
+    Sleep    1
+    ###摘要内容
+    ${内容}    Generate Random String    50
+    Input Text    //*[@id="form-field-8"]    ${内容}
+    Sleep    1
+    ##活动图片
+    Click Element    //*[@id="home"]/div[2]/form/div[3]/div/div/a/label/span
+    Wait Until Page Contains Element    //h4[text()="图片管理器"]
+    ${count}    Get Matching Xpath Count    //*[@id="select_ajax_form"]/div[3]/div/ul/li    #算出当前图片总数
+    ${rand}    Evaluate    random.randint(1, ${count})    modules=random
+    Sleep    2
+    Click Element    //*[@id="select_ajax_form"]/div[3]/div/ul/li[${rand}]/a/img
+    Sleep    2
+    #确定
+    Click Element    id=submitImage
+    Sleep    2
+    #下一步
+    Click Element    //*[@id="btnConfirm"]
+    Sleep    3
+    #活动名称
+    Input Text    //*[@id="rule"]/form/div[1]/div/input    ${标题}
+    #活动时间
+    ${start}    Get Time    \    NOW+1h
+    ${year}    Get Time    year    NOW
+    ${month}    Get Time    month    NOW
+    ${day}    Get Time    day    NOW+48h
+    ${end}    Set Variable    ${year}-${month}-${day} 10:10:10
+    log    ${end}
+    #开始时间
+    Input Text    //*[@id="start_time"]    ${start}
+    Sleep    2
+    #结束时间
+    Input Text    //*[@id="end_time"]    ${end}
+    #其他地方点击下，隐藏时间
+    Click Element    //*[@id="rule"]/form/div[1]/div/input
+    #奖品来源
+    Select From List By Value    //*[@id="rule"]/form/div[3]/div/select    1
+    #参加活动商品
+    选择商品    //*[@id="rule"]/form/div[5]/div/div[1]/a
+    Sleep    2
+    #保存并关闭
+    Click Element    //*[@id="saveBtn"]
+    Sleep    2
+    弹框校验
+    #开启状态
+    Wait Until Page Contains Element    //*[@id="breadcrumbs"]/ul/li    #等待 ‘秒杀活动管理’ 显示
+    #Click Element    //*[@id="main-container"]/div[1]/div[2]/div[2]/div/div/div[3]/table/tbody/tr[1]/td[6]/label/input
+    Sleep    3
+    #弹框校验    开启
+
+众筹活动-编辑
+    ####进入页面
+    点击菜单链接    微营销
+    Wait Until Page Contains Element    //*[@id="breadcrumbs"]/ul/li    #等待 ‘秒杀活动管理’ 显示
+    ${sub}    Set Variable    众筹活动
+    点击菜单链接    ${sub}
+    Sleep    3
+    #编辑
+    Click Element    //*[@id="main-container"]/div[1]/div[2]/div[2]/div/div/div/div/div[1]/form/table/tbody/tr/td[starts-with(text(),"【众筹活动】")]/ancestor::tr[1]/td[last()]/a[3]
+    ##输入图文标题
+    ${标题}    随机字符    【众筹活动】    12
+    Input Text    //*[@id="home"]/div[2]/form/div[1]/div/input    ${标题}
+    Sleep    1
+    ###摘要内容
+    ${内容}    Generate Random String    50
+    Input Text    //*[@id="form-field-8"]    ${内容}
+    Sleep    1
+    ##活动图片
+    Click Element    //*[@id="home"]/div[2]/form/div[3]/div/div/a/label/span
+    Wait Until Page Contains Element    //h4[text()="图片管理器"]
+    ${count}    Get Matching Xpath Count    //*[@id="select_ajax_form"]/div[3]/div/ul/li    #算出当前图片总数
+    ${rand}    Evaluate    random.randint(1, ${count})    modules=random
+    Sleep    2
+    Click Element    //*[@id="select_ajax_form"]/div[3]/div/ul/li[${rand}]/a/img
+    Sleep    2
+    #确定
+    Click Element    id=submitImage
+    Sleep    2
+    #下一步
+    Click Element    //*[@id="btnConfirm"]
+    Sleep    3
+    #活动名称
+    Input Text    //*[@id="rule"]/form/div[1]/div/input    ${标题}
+    #活动时间
+    ${start}    Get Time
+    ${year}    Get Time    year    NOW
+    ${month}    Get Time    month    NOW
+    ${day}    Get Time    day    NOW+48h
+    ${end}    Set Variable    ${year}-${month}-${day} 10:10:10
+    log    ${end}
+    #开始时间
+    Input Text    //*[@id="start_time"]    ${start}
+    Sleep    2
+    #结束时间
+    Input Text    //*[@id="end_time"]    ${end}
+    #其他地方点击下，隐藏时间
+    Click Element    //*[@id="rule"]/form/div[1]/div/input
+    #奖品来源
+    Select From List By Value    //*[@id="rule"]/form/div[3]/div/select    1
+    #参加活动商品
+    选择商品    //*[@id="rule"]/form/div[5]/div/div[1]/a
+    Sleep    2
+    #保存并关闭
+    Click Element    //*[@id="saveBtn"]
+    Sleep    2
+    弹框校验
+    #开启状态
+    Wait Until Page Contains Element    //*[@id="breadcrumbs"]/ul/li    #等待 ‘秒杀活动管理’ 显示
+    Click Element    //*[@id="main-container"]/div[1]/div[2]/div[2]/div/div/div[3]/table/tbody/tr[1]/td[6]/label/input
+    Sleep    3
+    弹框校验    开启
+
+众筹活动-删除
+    ####进入页面
+    点击菜单链接    微营销
+    Wait Until Page Contains Element    //*[@id="breadcrumbs"]/ul/li    #等待 ‘秒杀活动管理’ 显示
+    ${sub}    Set Variable    众筹活动
+    点击菜单链接    ${sub}
+    Sleep    3
+    #删除
+    ${text}    Get Text    //*[@id="main-container"]/div[1]/div[2]/div[2]/div/div/div/div/div[1]/form/table/tbody/tr/td[starts-with(text(),"【众筹活动】")]
+    Page Should Contain Element    //*[@id="main-container"]/div[1]/div[2]/div[2]/div/div/div/div/div[1]/form/table/tbody/tr/td[text()="${text}"]
+    Click Element    //*[@id="main-container"]/div[1]/div[2]/div[2]/div/div/div/div/div[1]/form/table/tbody/tr/td[starts-with(text(),"【众筹活动】")]/ancestor::tr[1]/td[last()]/a[4]
+    ##确定
+    确定
+    Sleep    2
+    弹框校验
+    Wait Until Page Contains Element    //*[@id="breadcrumbs"]/ul/li    #等待 ‘秒杀活动管理’ 显示
+    Page Should Not Contain Element    //*[@id="main-container"]/div[1]/div[2]/div[2]/div/div/div/div/div[1]/form/table/tbody/tr/td[text()="${text}"]
+
+大转盘-添加
+    [Tags]
+    点击菜单链接    微营销
+    Wait Until Page Contains Element    //*[@id="breadcrumbs"]/ul/li    #等待 ‘秒杀活动管理’ 显示
+    点击菜单链接    大转盘
+    Wait Until Page Contains Element    //*[@id="main-container"]/div[1]/div[2]/div[2]/div/div/div[1]/div/ul/li/a
+    ####生成参数
+    ###新增加活动
+    Click Link    新增活动
+    Sleep    2
+    #输入活动名称
+    ${actname}    随机字符    【大转盘】新增-    15
+    Input Text    id=activity_name    ${actname}
+    Sleep    2
+    ###活动基本信息设置
+    #活动时间
+    ${start}    Get Time    \    NOW+1h
+    ${year}    Get Time    year    NOW
+    ${month}    Get Time    month    NOW
+    ${day}    Get Time    day    NOW+48h
+    ${end}    Set Variable    ${year}-${month}-${day} 10:10:10
+    log    ${end}
+    #开始时间
+    Input Text    //*[@id="start_time"]    ${start}
+    Sleep    2
+    #结束时间
+    Input Text    //*[@id="end_time"]    ${end}
+    #其他地方点击下，隐藏时间
+    Click Element    id=activity_name
+    Sleep    2
+    Input Text    //*[@id="try_limit"]    1
+    #Click Element    xpath=//*[@id="main-container"]/div/div[2]/div[2]/div/div/div/ng-form/div/div[6]/div/label/input
+    Sleep    1
+    ###活动奖项设置
+    Input Text    id=prizename    谢谢参与！
+    Sleep    1
+    #一等奖
+    Input Text    xpath=//*[@id="main-container"]/div/div[2]/div[2]/div/div/div/ng-form/div/div[15]/div[2]/table/tbody/tr[2]/td[3]/input    苹果6S手机一部
+    Sleep    0.8
+    Input Text    xpath=//*[@id="main-container"]/div/div[2]/div[2]/div/div/div/ng-form/div/div[15]/div[2]/table/tbody/tr[2]/td[5]/input    2    #数量
+    #二等奖
+    Input Text    xpath=//*[@id="main-container"]/div/div[2]/div[2]/div/div/div/ng-form/div/div[15]/div[2]/table/tbody/tr[3]/td[3]/input    苹果5S手机一部
+    Sleep    0.8
+    Input Text    xpath=//*[@id="main-container"]/div/div[2]/div[2]/div/div/div/ng-form/div/div[15]/div[2]/table/tbody/tr[3]/td[5]/input    2    #数量
+    Sleep    1
+    #三等奖
+    Select From List    xpath=//*[@id="main-container"]/div/div[2]/div[2]/div/div/div/ng-form/div/div[15]/div[2]/table/tbody/tr[4]/td[2]/select    3    #积分
+    Sleep    0.6
+    Input Text    //*[@id="main-container"]/div/div[2]/div[2]/div/div/div/ng-form/div/div[15]/div[2]/table/tbody/tr[4]/td[3]/input    100
+    Sleep    0.5
+    Input Text    //*[@id="main-container"]/div/div[2]/div[2]/div/div/div/ng-form/div/div[15]/div[2]/table/tbody/tr[4]/td[5]/input    10
+    #兑奖结束时间
+    Click Element    id=prizetime
+    Sleep    1
+    Select Frame    xpath=//iframe[@hidefocus='true']
+    Click Element    xpath=//*[@id="dpTitle"]/div[6]/a
+    Sleep    1
+    ${class}    Get Element Attribute    //body/div/div[3]/table/tbody/tr[5]/td[6]@class
+    Click Element    xpath=/html/body/div/div[3]/table/tbody/tr[5]/td[6]
+    Sleep    1
+    Run Keyword If    '${class}'!='Wselday'    Click Element    id=dpOkInput
+    Unselect Frame
+    #Input Text    id=prizetime    2017-08-18 16:29:26
+    #保存并关闭
+    Sleep    1.5
+    Click Element    id=post
+    Sleep    3
+    ${alert}    Get Alert Message
+    Should Contain    ${alert}    成功
+    #Alert Should Be Present    提交成功!
+    Sleep    2
+    ###结果校验
+    ${actname2}    Get Text    xpath=//*[@id="main-container"]/div/div[2]/div[2]/div/div/div[3]/table/tbody/tr[1]/td[1]
+    Should Be Equal As Strings    ${actname}    ${actname2}
+    Log    Sucess!
+    Sleep    1
+
+大转盘-编辑
+    [Tags]
+    点击菜单链接    微营销
+    点击菜单链接    大转盘
+    Wait Until Page Contains    大转盘活动列表    20
+    Sleep    3
+    列表是否有数据
+    ###编辑活动
+    Click Element    xpath=//*[@id="main-container"]/div/div[2]/div[2]/div/div/div[3]/table/tbody/tr/td[starts-with(text(),"【大转盘】")]/ancestor::tr[1]/td[6]/div/a[@title="编辑"]/i
+    Sleep    2
+    #修改活动名称
+    ${actname}    随机字符    【大转盘】修改-    15
+    Input Text    activity_name    ${actname}
+    Sleep    1
+    Click Element    xpath=//*[@id="main-container"]/div/div[2]/div[2]/div[1]/div/div/ng-form/div[1]/div[6]/div/label/input
+    Sleep    1
+    ###提交保存
+    Click Element    id=post
+    Sleep    1
+    弹框校验
+    Page Should Contain Element    //*[@id="main-container"]/div[1]/div[2]/div[2]/div/div/div[3]/table/tbody/tr/td[text()="${actname}"]
+    Wait Until Page Contains    大转盘活动列表    20
+    Click Element    //*[@id="main-container"]/div[1]/div[2]/div[2]/div/div/div[3]/table/tbody/tr[1]/td[5]/label/input
+    弹框校验    已开启
+
+大转盘-删除
+    [Tags]
+    点击菜单链接    微营销
+    点击菜单链接    大转盘
+    Wait Until Page Contains    大转盘活动列表
+    Sleep    1
+    列表是否有数据
+    ###删除活动
+    Click Element    xpath=//*[@id="main-container"]/div/div[2]/div[2]/div/div/div[3]/table/tbody/tr/td[starts-with(text(),"【大转盘】")]/ancestor::tr[1]/td[6]/div/a[@title="删除"]/i
+    Sleep    2
+    确定
+    Sleep    2
+    ${text}    Get Alert Message
+    ${msg}    Set Variable    进行中的活动不能删除
+    Sleep    1
+    Run Keyword If    '${text}'=='${msg}'    关闭大转盘
+
+砸金蛋-添加
+    [Tags]
+    点击菜单链接    微营销
+    Wait Until Page Contains Element    //*[@id="breadcrumbs"]/ul/li    #等待 ‘秒杀活动管理’ 显示
+    点击菜单链接    砸金蛋
+    Wait Until Page Contains Element    //*[@id="main-container"]/div[1]/div[2]/div[2]/div/div/div[1]/div/ul/li/a
+    ####生成参数
+    ###新增加活动
+    Click Link    新增活动
+    Sleep    2
+    #输入活动名称
+    ${actname}    随机字符    【砸金蛋】新增-    15
+    Input Text    id=activity_name    ${actname}
+    Sleep    2
+    ###活动基本信息设置
+    #活动时间
+    ${start}    Get Time    \    NOW+1min
+    ${year}    Get Time    year    NOW
+    ${month}    Get Time    month    NOW
+    ${day}    Get Time    day    NOW+48h
+    ${end}    Set Variable    ${year}-${month}-${day} 10:10:10
+    log    ${end}
+    #开始时间
+    Input Text    //*[@id="start_time"]    ${start}
+    Sleep    2
+    #结束时间
+    Input Text    //*[@id="end_time"]    ${end}
+    #其他地方点击下，隐藏时间
+    Click Element    id=activity_name
+    Sleep    2
+    Input Text    //*[@id="try_limit"]    1
+    #Click Element    xpath=//*[@id="main-container"]/div/div[2]/div[2]/div/div/div/ng-form/div/div[6]/div/label/input
+    Sleep    1
+    ###活动奖项设置
+    Input Text    id=prizename    谢谢参与！
+    Sleep    1
+    #一等奖
+    Input Text    xpath=//*[@id="main-container"]/div/div[2]/div[2]/div/div/div/ng-form/div/div[15]/div[2]/table/tbody/tr[2]/td[3]/input    苹果6S手机一部
+    Sleep    0.8
+    Input Text    xpath=//*[@id="main-container"]/div/div[2]/div[2]/div/div/div/ng-form/div/div[15]/div[2]/table/tbody/tr[2]/td[5]/input    2    #数量
+    #二等奖
+    Input Text    xpath=//*[@id="main-container"]/div/div[2]/div[2]/div/div/div/ng-form/div/div[15]/div[2]/table/tbody/tr[3]/td[3]/input    苹果5S手机一部
+    Sleep    0.8
+    Input Text    xpath=//*[@id="main-container"]/div/div[2]/div[2]/div/div/div/ng-form/div/div[15]/div[2]/table/tbody/tr[3]/td[5]/input    2    #数量
+    Sleep    1
+    #三等奖
+    Select From List    xpath=//*[@id="main-container"]/div/div[2]/div[2]/div/div/div/ng-form/div/div[15]/div[2]/table/tbody/tr[4]/td[2]/select    3    #积分
+    Sleep    0.6
+    Input Text    //*[@id="main-container"]/div/div[2]/div[2]/div/div/div/ng-form/div/div[15]/div[2]/table/tbody/tr[4]/td[3]/input    100
+    Sleep    0.5
+    Input Text    //*[@id="main-container"]/div/div[2]/div[2]/div/div/div/ng-form/div/div[15]/div[2]/table/tbody/tr[4]/td[5]/input    10
+    #兑奖结束时间
+    Click Element    id=prizetime
+    Sleep    1
+    Select Frame    xpath=//iframe[@hidefocus='true']
+    Click Element    xpath=//*[@id="dpTitle"]/div[6]/a
+    Sleep    1
+    ${class}    Get Element Attribute    //body/div/div[3]/table/tbody/tr[5]/td[6]@class
+    Click Element    xpath=/html/body/div/div[3]/table/tbody/tr[5]/td[6]
+    Sleep    1
+    Run Keyword If    '${class}'!='Wselday'    Click Element    id=dpOkInput
+    Unselect Frame
+    #Input Text    id=prizetime    2017-08-18 16:29:26
+    #保存并关闭
+    Sleep    1.5
+    Click Element    id=post
+    Sleep    4
+    ${alert}    Get Alert Message
+    Should Contain    ${alert}    成功
+    #Alert Should Be Present    提交成功!
+    Sleep    5
+    ###结果校验
+    ${actname2}    Get Text    xpath=//*[@id="main-container"]/div/div[2]/div[2]/div/div/div[3]/table/tbody/tr[1]/td[1]
+    Should Be Equal As Strings    ${actname}    ${actname2}
+    Log    Sucess!
+
+砸金蛋-编辑
+    [Tags]
+    点击菜单链接    微营销
+    点击菜单链接    砸金蛋
+    Sleep    5
+    列表是否有数据
+    ###编辑活动
+    Click Element    xpath=//*[@id="main-container"]/div/div[2]/div[2]/div/div/div[3]/table/tbody/tr/td[starts-with(text(),"【砸金蛋】")]/ancestor::tr[1]/td[6]/div/a[@title="编辑"]/i
+    Sleep    2
+    #修改活动名称
+    ${actname}    随机字符    【砸金蛋】修改-    15
+    Input Text    activity_name    ${actname}
+    Sleep    1
+    Click Element    xpath=//*[@id="main-container"]/div/div[2]/div[2]/div[1]/div/div/ng-form/div[1]/div[6]/div/label/input
+    Sleep    1
+    ###提交保存
+    Click Element    id=post
+    Sleep    1
+    弹框校验
+    Page Should Contain Element    //*[@id="main-container"]/div[1]/div[2]/div[2]/div/div/div[3]/table/tbody/tr/td[text()="${actname}"]
+    Wait Until Page Contains    砸金蛋活动列表    20
+    Click Element    //*[@id="main-container"]/div[1]/div[2]/div[2]/div/div/div[3]/table/tbody/tr[1]/td[5]/label/input
+    弹框校验    已开启
+
+砸金蛋-删除
+    [Tags]
+    点击菜单链接    微营销
+    点击菜单链接    砸金蛋
+    Sleep    5
+    列表是否有数据
+    ###删除活动    //*[@id="main-container"]/div[1]/div[2]/div[2]/div/div/div[3]/table/tbody/tr[1]/td[6]/div/a[4]/i
+    Click Element    xpath=//*[@id="main-container"]/div/div[2]/div[2]/div/div/div[3]/table/tbody/tr/td[starts-with(text(),"【砸金蛋】")]/ancestor::tr[1]/td[6]/div/a[@title="删除"]/i
+    Sleep    2
+    确定
+    Sleep    2
+    ${text}    Get Alert Message
+    ${msg}    Set Variable    进行中的活动不能删除
+    Sleep    1
+    Run Keyword If    '${text}'=='${msg}'    关闭砸金蛋
+
+记忆翻翻看-添加默认
+    点击菜单链接    微营销
+    Wait Until Page Contains Element    //*[@id="breadcrumbs"]/ul/li    #等待 ‘秒杀活动管理’ 显示
+    点击菜单链接    记忆翻翻看
+    Sleep    5
+    ####生成参数
+    ###新增加活动
+    Click Link    新增活动
+    Sleep    2
+    #选择logo
+    选择图片    //*[@id="main-container"]/div/div[2]/div[2]/div/div[2]/div[1]/div/form/div[1]/div[2]/div/a/div[1]    //*[@id="submitImage"]
+    Sleep    2
+    #下一步
+    Click Element    //*[@id="modal-footer"]/a[1]
+    Sleep    2
+    #输入活动名称
+    ${actname}    随机字符    【记忆翻翻看】不抽奖-    15
+    Input Text    id=activity_name    ${actname}
+    Sleep    2
+    ###活动基本信息设置
+    #活动时间
+    ${start}    Get Time    \    NOW+1h
+    ${year}    Get Time    year    NOW
+    ${month}    Get Time    month    NOW
+    ${day}    Get Time    day    NOW+48h
+    ${end}    Set Variable    ${year}-${month}-${day} 10:10:10
+    log    ${end}
+    #开始时间
+    Input Text    //*[@id="start_time"]    ${start}
+    Sleep    2
+    #结束时间
+    Input Text    //*[@id="end_time"]    ${end}
+    #其他地方点击下，隐藏时间
+    Click Element    id=activity_name
+    Sleep    2
+    #保存并关闭
+    Sleep    1.5
+    Click Element    id=post
+    Sleep    4
+    ${alert}    Get Alert Message
+    Should Contain    ${alert}    成功
+    #Alert Should Be Present    提交成功!
+    Sleep    2
+    ###结果校验
+    ${actname2}    Get Text    xpath=//*[@id="main-container"]/div/div[2]/div[2]/div/div/div[3]/table/tbody/tr[1]/td[1]
+    Should Be Equal As Strings    ${actname}    ${actname2}
+    Log    Sucess!
+
+记忆翻翻看-添加抽奖
+    点击菜单链接    微营销
+    Wait Until Page Contains Element    //*[@id="breadcrumbs"]/ul/li    #等待 ‘秒杀活动管理’ 显示
+    点击菜单链接    记忆翻翻看
+    Sleep    5
+    ####生成参数
+    ###新增加活动
+    Click Link    新增活动
+    Sleep    2
+    #选择logo
+    选择图片    //*[@id="main-container"]/div/div[2]/div[2]/div/div[2]/div[1]/div/form/div[1]/div[2]/div/a/div[1]    //*[@id="submitImage"]
+    Sleep    2
+    #下一步
+    Click Element    //*[@id="modal-footer"]/a[1]
+    Sleep    2
+    #输入活动名称
+    ${actname}    随机字符    【记忆翻翻看】抽奖-    15
+    Input Text    id=activity_name    ${actname}
+    Sleep    2
+    ###活动基本信息设置
+    #活动时间
+    ${start}    Get Time    \    NOW+1h
+    ${year}    Get Time    year    NOW
+    ${month}    Get Time    month    NOW
+    ${day}    Get Time    day    NOW+48h
+    ${end}    Set Variable    ${year}-${month}-${day} 10:10:10
+    log    ${end}
+    #开始时间
+    Input Text    //*[@id="start_time"]    ${start}
+    Sleep    2
+    #结束时间
+    Input Text    //*[@id="end_time"]    ${end}
+    #其他地方点击下，隐藏时间
+    Click Element    id=activity_name
+    Sleep    2
+    Execute Javascript    var evaluator = new XPathEvaluator();var result = evaluator.evaluate('//*[@id="activity_name"]', document.documentElement, null,XPathResult.ORDERED_NODE_ITERATOR_TYPE, null); var node = result.iterateNext();node.scrollIntoView();
+    #Execute Javascript    var ticScroll=0; \ \ \ \ function Nscroll() \ \ \ \ { \ \ \ \ \ \ \ \ if(ticScroll!=1000) \ \ \ \ \ \ \ \ { \ \ \ \ \ \ \ \ \ \ \ \ ticScroll++; \ \ \ \ \ \ \ \ \ \ \ \ scroll(0,ticScroll); \ \ \ \ \ \ \ \ \ \ \ \ clearTimeout(timer); \ \ \ \ \ \ \ \ \ \ \ \ var timer=setTimeout("Nscroll()",54); \ \ \ \ \ \ \ \ \ \ \ \ timer; \ \ \ \ \ \ \ \ } \ \ \ \ }
+    Sleep    2
+    #根据成绩抽奖
+    Click Element    //*[@id="main-container"]/div/div[2]/div[2]/div/div[2]/div[2]/div/div/div/ng-form/div/div[7]/div[4]/div[1]/div/div/label[2]
+    Sleep    1
+    ###活动奖项设置
+    Input Text    id=prizename    谢谢参与！
+    Sleep    1
+    #一等奖
+    Input Text    //*[@id="main-container"]/div/div[2]/div[2]/div/div[2]/div[2]/div/div/div/ng-form/div/div[7]/div[4]/div[2]/div[2]/div[6]/div/table/tbody/tr[2]/td[3]/input    苹果6S手机一部
+    Sleep    0.8
+    Input Text    //*[@id="main-container"]/div/div[2]/div[2]/div/div[2]/div[2]/div/div/div/ng-form/div/div[7]/div[4]/div[2]/div[2]/div[6]/div/table/tbody/tr[2]/td[5]/input    2    #数量
+    #二等奖
+    Input Text    //*[@id="main-container"]/div/div[2]/div[2]/div/div[2]/div[2]/div/div/div/ng-form/div/div[7]/div[4]/div[2]/div[2]/div[6]/div/table/tbody/tr[3]/td[3]/input    苹果5S手机一部
+    Sleep    0.8
+    Input Text    //*[@id="main-container"]/div/div[2]/div[2]/div/div[2]/div[2]/div/div/div/ng-form/div/div[7]/div[4]/div[2]/div[2]/div[6]/div/table/tbody/tr[3]/td[5]/input    2    #数量
+    Sleep    1
+    #三等奖
+    Select From List    //*[@id="main-container"]/div/div[2]/div[2]/div/div[2]/div[2]/div/div/div/ng-form/div/div[7]/div[4]/div[2]/div[2]/div[6]/div/table/tbody/tr[4]/td[2]/select    3    #积分
+    Sleep    0.6
+    Input Text    //*[@id="main-container"]/div/div[2]/div[2]/div/div[2]/div[2]/div/div/div/ng-form/div/div[7]/div[4]/div[2]/div[2]/div[6]/div/table/tbody/tr[4]/td[3]/input    100
+    Sleep    0.5
+    Input Text    //*[@id="main-container"]/div/div[2]/div[2]/div/div[2]/div[2]/div/div/div/ng-form/div/div[7]/div[4]/div[2]/div[2]/div[6]/div/table/tbody/tr[4]/td[5]/input    10
+    #兑奖结束时间
+    Click Element    id=prizetime
+    Sleep    1
+    Select Frame    xpath=//iframe[@hidefocus='true']
+    Click Element    xpath=//*[@id="dpTitle"]/div[6]/a
+    Sleep    1
+    ${class}    Get Element Attribute    //body/div/div[3]/table/tbody/tr[5]/td[6]@class
+    Click Element    xpath=/html/body/div/div[3]/table/tbody/tr[5]/td[6]
+    Sleep    1
+    Run Keyword If    '${class}'!='Wselday'    Click Element    id=dpOkInput
+    Unselect Frame
+    #保存并关闭
+    Sleep    1.5
+    Click Element    id=post
+    Sleep    4
+    ${alert}    Get Alert Message
+    Should Contain    ${alert}    成功
+    #Alert Should Be Present    提交成功!
+    Sleep    2
+    ###结果校验
+    ${actname2}    Get Text    xpath=//*[@id="main-container"]/div/div[2]/div[2]/div/div/div[3]/table/tbody/tr[1]/td[1]
+    Should Be Equal As Strings    ${actname}    ${actname2}
+    Log    Sucess!
+
+*** Keywords ***
+选择商品
+    [Arguments]    ${goods}
+    Click Element    ${goods}
+    Sleep    2
+    Click Element    //*[@id="product"]/div[1]/table/tbody[1]/tr[1]
+    Sleep    2
+    Click Element    //*[@id="product"]/div[1]/table/tbody[1]/tr[2]/td/table/tbody/tr[2]/td[1]/label/input
+    Sleep    2
+    #确定
+    Click Element    //*[@id="productModal"]/div/div/div[3]/a[2]
+    #设置商品
+    Input Text    //*[@id="tbody"]/tr/td[6]/input    10    #奖品数量
+    Sleep    1
+    Input Text    //*[@id="tbody"]/tr/td[7]/input    2    #点赞数
+    Sleep    1
+    Click Element    //*[@id="tbody"]/tr/td[8]/div/a[1]/i    #保存
+    Sleep    2
+    弹框校验
+
+选择现金红包
+    [Arguments]    ${locator}
+    Click Element    ${locator}
+    Wait Until Page Contains Element    xpath=//h4[text()='选择现金红包']
+    Sleep    1
+    ###
+    ${els}    Get Matching Xpath Count    //tr[@ng-repeat="list in redCashPackList"]/td[@ng-bind="list.act_name"]
+    ${rand}    Evaluate    random.randint(1,${els})    random
+    Click Element    xpath=(//tr[@ng-repeat="list in redCashPackList"]/td[@ng-bind="list.act_name"])[${rand}]
+    Sleep    1
+    Click Element    xpath=//*[@id="redCashPackModal"]/div/div/form/div[3]/a[2]
+    ${红包剩余数量}    Get Text    xpath=(//tr[@ng-repeat="list in redCashPackList"]/td[@ng-bind="list.act_name"]/parent::tr[1]/td[3])[${rand}]
+    Sleep    2
+    [Return]    ${红包剩余数量}
+
+关闭大转盘
+    log    准备关闭已开启的大转盘活动
+    #能进入这里，说明要删除的第一个是开启的    //*[@id="main-container"]/div[1]/div[2]/div[2]/div/div/div[3]/table/tbody/tr[1]/td[5]/label/input
+    Click Element    xpath=//*[@id="main-container"]/div/div[2]/div[2]/div/div/div[3]/table/tbody/tr/td[starts-with(text(),"【大转盘】")]/ancestor::tr[1]/td[5]/label/input
+    Sleep    5
+    弹框校验    已关闭
+    Sleep    5
+    ####删除
+    Click Element    xpath=//*[@id="main-container"]/div/div[2]/div[2]/div/div/div[3]/table/tbody/tr/td[starts-with(text(),"【大转盘】")]/ancestor::tr[1]/td[6]/div/a[@title="删除"]/i
+    Sleep    3
+    #确认删除提示
+    确定
+    Sleep    3
+    弹框校验
+
+关闭砸金蛋
+    log    准备关闭已开启的砸金蛋活动
+    #能进入这里，说明要删除的第一个是开启的    //*[@id="main-container"]/div[1]/div[2]/div[2]/div/div/div[3]/table/tbody/tr[1]/td[5]/label/input
+    Click Element    xpath=//*[@id="main-container"]/div/div[2]/div[2]/div/div/div[3]/table/tbody/tr/td[starts-with(text(),"【砸金蛋】")]/ancestor::tr[1]/td[5]/label/input
+    Sleep    5
+    弹框校验    已关闭
+    Sleep    5
+    ####删除
+    Click Element    xpath=//*[@id="main-container"]/div/div[2]/div[2]/div/div/div[3]/table/tbody/tr/td[starts-with(text(),"【砸金蛋】")]/ancestor::tr[1]/td[6]/div/a[@title="删除"]/i
+    Sleep    3
+    #确认删除提示
+    确定
+    Sleep    3
+    弹框校验
+
+选择图片
+    [Arguments]    ${选择按钮}    ${确定按钮}
+    ####选择图
+    Click Element    ${选择按钮}
+    Sleep    3
+    ${len}    Get Matching Xpath Count    //*[@id="select_ajax_form"]/div[3]/div/ul/li
+    ${图片}    Evaluate    random.randint(1,${len})    random
+    Sleep    2
+    Click Element    //*[@id="select_ajax_form"]/div[3]/div/ul/li[${图片}]
+    Sleep    2
+    Click Element    ${确定按钮}

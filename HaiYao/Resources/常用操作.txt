@@ -1,0 +1,76 @@
+*** Settings ***
+Library           Selenium2Library
+Library           String
+Library           Screenshot
+Library           ExcelLibrary
+Resource          BaseData.txt
+
+*** Variables ***
+
+*** Keywords ***
+等待时间
+    [Arguments]    ${time}=2
+    Sleep    ${time}
+
+随机字符
+    [Arguments]    ${pre}    ${len}
+    ${prelen}    Get Length    ${pre}
+    ${lens}    Evaluate    ${len}-${prelen}
+    ${rand}    Generate Random String    ${lens}
+    ${str}    Set Variable    ${pre}${rand}
+    [Return]    ${str}
+
+随机数
+    [Arguments]    ${s}    ${e}
+    ${rnumber}    Evaluate    random.randint(${s}, ${e})    modules=random, sys
+    log    ${rnumber}
+    [Return]    ${rnumber}
+
+结果校验
+    [Arguments]    ${num}
+    [Documentation]    列表中的数量与预期的数量比较
+    等待时间    2
+    ${n}    Get Matching Xpath Count    xpath=//div[@class="box-content"]/table/tbody/tr
+    Run Keyword If    ${n}==${num}    log    Success!
+    ...    ELSE    Fail    查询数量错误，应该只有${num}个，实际还有${n}个
+    等待时间    1
+
+名称修改-删除
+    [Arguments]    ${n}
+    [Documentation]    先判断有没自己添加的数据
+    ...
+    ...    聚焦到对应的删除或修改按钮上；
+    ...
+    ...    点击删除/修改
+    #先查询出开头的    【名称】【修改】    按理只有一个
+    Wait Until Page Contains Element    xpath=//div[@class="box-content"]/table/tbody/tr/td[starts-with(text(),"${name.a}") or starts-with(text(),"${name.u}")]    10    没有自己添加的数据
+    ${名称}    Get Text    xpath=//div[@class="box-content"]/table/tbody/tr/td[starts-with(text(),"${name.a}") or starts-with(text(),"${name.u}")]
+    等待时间    1
+    Focus    xpath=//div[@class="box-content"]/table/tbody/tr/td[starts-with(text(),"${name.a}") or starts-with(text(),"${name.u}")]/../td[last()]/a[${n}]
+    #删除
+    Comment    点击删除    修改
+    Click Element    xpath=//div[@class="box-content"]/table/tbody/tr/td[starts-with(text(),"${name.a}") or starts-with(text(),"${name.u}")]/../td[last()]/a[${n}]
+    等待时间    2
+    [Return]    ${名称}
+
+确认删除
+    Click Element    xpath=//div[@class="delete"]/div[2]/button[2]
+
+随机手机号
+    ${du}    Generate Random String    1    3456789
+    ${pre}    Generate Random String    1    023456789
+    ${num}    Generate Random String    8    0123456789
+    ${phone}    Set Variable    1${du}${pre}${num}
+    [Return]    ${phone}
+
+随机邮箱
+    ${la}    Generate Random String    2    [LOWER]
+    ${pre}    Generate Random String    8
+    ${email}    Set Variable    ${pre}@${la}.com
+    [Return]    ${email}
+
+礼物状态校验
+    [Arguments]    ${礼物名称}    ${n}    ${status}
+    ${状态}    Get Text    xpath=//div[@class="box-content"]/table/tbody/tr/td[text()="${礼物名称}"]/../td[${n}]
+    Run Keyword If    "${状态}"=="${status}"    log    success!
+    ...    ELSE    Fail    状态显示错误!${状态}<>${status}

@@ -1,0 +1,197 @@
+*** Settings ***
+Suite Setup       登录
+Suite Teardown    关闭浏览器
+Test Teardown     失败重启
+Library           Selenium2Library
+Library           String
+Resource          ../Resource/常用操作.robot
+Resource          ../Resource/配置参数.robot
+
+*** Test Cases ***
+关键词回复_添加
+    ####进入页面
+    点击菜单链接    微信设置
+    Wait Until Page Contains Element    //*[@id="navList"]/li[2]/ul/li[1]/a    #等待 ‘关键词回复’ 显示
+    ${sub}    Set Variable    关键词回复
+    点击菜单链接    ${sub}
+    Wait Until Page Contains Element    //*[@id="breadcrumbs"]/ul/li    #等待 ‘回复管理’ 显示
+    ####新建关键词回复
+    点击菜单链接    新建关键词回复
+    Wait Until Page Contains Element    //*[@id="breadcrumbs"]/ul/li    #等待 ‘添加关键字’ 显示
+    ##输入关键字
+    ${标题}    随机字符    【关键字回复】    12
+    Input Text    //*[@id="main-container"]/div/div[2]/div[2]/div/div[2]/form/div[1]/table/tbody/tr[2]/td[2]/input    ${标题}
+    Sleep    1
+    ##匹配方式
+    ${选择}    Generate Random String    1    01
+    Select From List By Value    //*[@id="main-container"]/div/div[2]/div[2]/div/div[2]/form/div[1]/table/tbody/tr[4]/td[2]/select    ${选择}
+    Sleep    1
+    ##点击添加一条消息
+    添加一条消息    //*[@id="main-container"]/div/div[2]/div[2]/div/div[2]/form/div[2]/table/tbody/tr[2]/td/a
+
+关键词回复_修改
+    ####进入页面
+    点击菜单链接    微信设置
+    Wait Until Page Contains Element    //*[@id="navList"]/li[2]/ul/li[1]/a    #等待 ‘关键词回复’ 显示
+    ${sub}    Set Variable    关键词回复
+    点击菜单链接    ${sub}
+    Wait Until Page Contains Element    //*[@id="breadcrumbs"]/ul/li    #等待 ‘回复管理’ 显示
+    #编辑
+    Click Element    //*[@id="main"]/div[2]/ul/li//div[1]/b[starts-with(text(),"关键字：【关键字回复】")]/ancestor::li[1]/div[last()]/span[1]/a[@title="编辑"]
+    Sleep    3
+    ${标题}    随机字符    【关键字回复】    12
+    Input Text    //*[@id="main-container"]/div/div[2]/div[2]/div/div[2]/form/div[1]/table/tbody/tr[2]/td[2]/input    ${标题}
+    ##点击添加一条消息
+    添加一条消息    //*[@id="main-container"]/div/div[2]/div[2]/div/div[2]/form/div[2]/table/tbody/tr[3]/td/a
+
+关键词回复_删除
+    ####进入页面
+    点击菜单链接    微信设置
+    Wait Until Page Contains Element    //*[@id="navList"]/li[2]/ul/li[1]/a    #等待 ‘关键词回复’ 显示
+    ${sub}    Set Variable    关键词回复
+    点击菜单链接    ${sub}
+    Wait Until Page Contains Element    //*[@id="breadcrumbs"]/ul/li    #等待 ‘回复管理’ 显示
+    ##删除
+    #获取要删除的标题
+    ${文本标题}    Get Text    //*[@id="main"]/div[2]/ul/li//div[1]/b[starts-with(text(),"关键字：【关键字回复】")]
+    Sleep    3
+    Click Element    //*[@id="main"]/div[2]/ul/li//div[1]/b[starts-with(text(),"关键字：【关键字回复】")]/ancestor::li[1]/div[last()]/span[2]/a[@title="删除"]
+    Sleep    3
+    确定
+    Sleep    2
+    弹框校验
+    Sleep    3
+    #删除后应没有这个元素了
+    Page Should Not Contain Element    //*[@id="main"]/div[2]/ul/li//div[1]/b[contains(text(),"${文本标题}")]
+
+默认回复_添加
+    ####进入页面
+    点击菜单链接    微信设置
+    Wait Until Page Contains Element    //*[@id="navList"]/li[2]/ul/li[2]/a    #等待 ‘默认回复’ 显示
+    ${sub}    Set Variable    默认回复
+    点击菜单链接    ${sub}
+    Wait Until Page Contains Element    //*[@id="breadcrumbs"]/ul/li    #等待 ‘编辑默认回复’ 显示
+    ##点击添加一条消息
+    添加一条消息    //*[@id="main-container"]/div/div[2]/div[2]/div[1]/div[5]/a
+
+默认回复_修改
+    ####进入页面
+    点击菜单链接    微信设置
+    Wait Until Page Contains Element    //*[@id="navList"]/li[2]/ul/li[2]/a
+    ${sub}    Set Variable    默认回复
+    点击菜单链接    ${sub}
+    Sleep    3
+    Wait Until Page Contains Element    //*[@id="breadcrumbs"]/ul/li    #等待 ‘编辑默认回复’ 显示
+    ##编辑
+    ${le}    Get Matching Xpath Count    //*[@id="main-container"]/div/div[2]/div[2]/div[1]/div[4]/div/table/tbody/tr
+    ${lens}    Evaluate    ${le}-1
+    Pass Execution If    ${lens}==0    没有默认回复消息，不能修改
+    ${随机数}    Evaluate    random.randint(2, ${le})    modules=random
+    #编辑
+    添加一条消息    //*[@id="main-container"]/div/div[2]/div[2]/div[1]/div[4]/div/table/tbody/tr[${随机数}]/td[2]/a[1]
+
+默认回复_删除
+    ####进入页面
+    点击菜单链接    微信设置
+    Wait Until Page Contains Element    //*[@id="navList"]/li[2]/ul/li[2]/a
+    ${sub}    Set Variable    默认回复
+    点击菜单链接    ${sub}
+    Sleep    3
+    Wait Until Page Contains Element    //*[@id="breadcrumbs"]/ul/li    #等待 ‘编辑默认回复’ 显示
+    ##删除
+    ${le}    Get Matching Xpath Count    //*[@id="main-container"]/div/div[2]/div[2]/div[1]/div[4]/div/table/tbody/tr
+    ${lens}    Evaluate    ${le}-1
+    Pass Execution If    ${lens}==0    没有默认回复消息，不能删除
+    ${随机数}    Evaluate    random.randint(2, ${le})    modules=random
+    Click Element    //*[@id="main-container"]/div/div[2]/div[2]/div[1]/div[4]/div/table/tbody/tr[${随机数}]/td[2]/a[2]
+    Sleep    2
+    确定    删除
+    Sleep    2
+    #底部确定按钮
+    Click Element    //*[@id="modal-footer"]/a
+    Sleep    2
+    弹框校验
+
+关注后回复_添加
+    ####进入页面
+    点击菜单链接    微信设置
+    Wait Until Page Contains Element    //*[@id="navList"]/li[2]/a/span
+    ##点击回复管理    展开
+    Click Element    //*[@id="navList"]/li[2]/a/span
+    Wait Until Page Contains Element    //*[@id="breadcrumbs"]/ul/li    #等待 ‘回复管理’ 显示
+    ${sub}    Set Variable    关注后回复
+    点击菜单链接    ${sub}
+    Sleep    3
+    Wait Until Page Contains Element    //*[@id="breadcrumbs"]/ul/li    #等待 ‘编辑默认回复’ 显示
+    ##点击添加一条消息
+    Click Element    //*[@id="main-container"]/div/div[2]/div[2]/div/div[2]/div[2]/table/tbody/tr[3]/td/a
+    Sleep    2
+    添加一条消息
+
+关注后回复_修改
+    ####进入页面
+    点击菜单链接    微信设置
+    Wait Until Page Contains Element    //*[@id="navList"]/li[2]/a/span
+    ##点击回复管理    展开
+    Click Element    //*[@id="navList"]/li[2]/a/span
+    Wait Until Page Contains Element    //*[@id="breadcrumbs"]/ul/li    #等待 ‘回复管理’ 显示
+    ${sub}    Set Variable    关注后回复
+    点击菜单链接    ${sub}
+    Sleep    3
+    Wait Until Page Contains Element    //*[@id="breadcrumbs"]/ul/li    #等待 ‘编辑默认回复’ 显示
+    ##编辑
+    ${le}    Get Matching Xpath Count    //*[@id="main-container"]/div/div[2]/div[2]/div/div[2]/div[2]/table/tbody/tr
+    ${lens}    Evaluate    ${le}-1
+    Pass Execution If    ${lens}==0    没有回复消息，不能修改
+    ${随机数}    Evaluate    random.randint(2, ${lens})    modules=random
+    Click Element    //*[@id="main-container"]/div/div[2]/div[2]/div/div[2]/div[2]/table/tbody/tr[${随机数}]/td[2]/a[1]
+    添加一条消息
+
+关注后回复_删除
+    ####进入页面
+    点击菜单链接    微信设置
+    Wait Until Page Contains Element    //*[@id="navList"]/li[2]/a/span
+    ##点击回复管理    展开
+    Click Element    //*[@id="navList"]/li[2]/a/span
+    Wait Until Page Contains Element    //*[@id="breadcrumbs"]/ul/li    #等待 ‘回复管理’ 显示
+    ${sub}    Set Variable    关注后回复
+    点击菜单链接    ${sub}
+    Sleep    3
+    Wait Until Page Contains Element    //*[@id="breadcrumbs"]/ul/li    #等待 ‘编辑默认回复’ 显示
+    ##编辑
+    ${le}    Get Matching Xpath Count    //*[@id="main-container"]/div/div[2]/div[2]/div/div[2]/div[2]/table/tbody/tr
+    ${lens}    Evaluate    ${le}-1
+    Pass Execution If    ${lens}==0    没有回复消息，不能修改
+    ${随机数}    Evaluate    random.randint(2, ${lens})    modules=random
+    Click Element    //*[@id="main-container"]/div/div[2]/div[2]/div/div[2]/div[2]/table/tbody/tr[${随机数}]/td[2]/a[2]
+    Sleep    3
+    确定
+    Sleep    3
+    #底部确定按钮
+    Click Element    //*[@id="modal-footer"]/a
+    Sleep    3
+    弹框校验
+
+*** Keywords ***
+添加一条消息
+    [Arguments]    ${add}=//*[@id="main-container"]/div/div[2]/div[2]/div[1]/div[5]/a
+    Click Element    ${add}
+    Sleep    3
+    ##选择素材
+    Wait Until Page Contains Element    //h4[text()="选择素材"]
+    Sleep    3
+    ${随机}    Generate Random String    1    123
+    Click Element    //*[@id="myWxmaterialTab"]/li[${随机}]
+    Sleep    2
+    ${lens}    Get Matching Xpath Count    //*[@id="mytabPane"]/div[${随机}]/ul/li
+    log    ${lens}
+    ${图片}    Evaluate    random.randint(1,${lens})    modules=random
+    Click Element    //*[@id="mytabPane"]/div[${随机}]/ul/li[${图片}]
+    Sleep    3
+    ##保存
+    Click Element    //*[@id="insertMaterial"]/div/div/div[3]/a[2]
+    Sleep    3
+    ##确定
+    Click Element    //*[@id="modal-footer"]/a
+    Sleep    3
+    弹框校验

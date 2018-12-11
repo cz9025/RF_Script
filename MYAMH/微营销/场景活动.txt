@@ -1,0 +1,11 @@
+*** Settings ***
+Library           Selenium2Library
+
+*** Test Cases ***
+获得执行的状态
+    ${a}    Set Variable    qwe
+    ${b}    Set Variable    w
+    ${c}    Run Keyword And Return Status    Should Contain    ${a}    ${b}
+    log    ${c}
+    Run Keyword If    ${c}    log    dui le
+    ...    ELSE    log    cuo le

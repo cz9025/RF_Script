@@ -1,0 +1,26 @@
+*** Settings ***
+Library           DateTime
+
+*** Test Cases ***
+时间处理
+    #获取当前时间    	2017-03-29 21:01:16
+    ${time}    Get Current Date    exclude_millis=true    #不让显示毫秒
+    log    ${time}
+    #     获取年月
+    ${time2}    Get Current Date    result_format=datetime
+    log    ${time2.year}
+    log    ${time2.month}
+    #    在指定日期上加上时间
+    ${time}    Add Time To Date    2017-03-29 21:02:13.111    3days
+    Should Be Equal    ${time}    2017-04-01 21:02:13.111
+    log    ${time}
+    #    在指定日期上加上时间
+    ${time}    Add Time To Date    2017-03-29 21:02:13.111    01:01:01.001
+    Should Be Equal    ${time}    2017-03-29 22:03:14.112
+    log    ${time}
+    #    两个日期相差的时间
+    ${time}    Subtract Date From Date    2017-04-01 21:02:13.111    2017-03-29 21:02:13.111
+    log    ${time}    #毫秒显示
+    #    两个日期相差的时间
+    ${time}    Subtract Date From Date    2017-04-01 21:02:13.111    2017-03-29 21:02:13.111    verbose
+    log    ${time}    #3days

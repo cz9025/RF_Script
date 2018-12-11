@@ -1,0 +1,149 @@
+*** Settings ***
+Library           String
+Library           AppiumLibrary
+Library           BuiltIn
+
+*** Test Cases ***
+无NFC直接启动app
+    [Documentation]    直接启动的：前提要先登录账号
+    #R9S
+    Open Application    http://localhost:4723/wd/hub    platformName=Android    platformVersion=4.4.4    deviceName=bdefdc13
+    Comment    Sleep    15
+    Start Activity    com.nci.tkb    com.nci.tkb.ui.activity.welcome.WelcomeActivity2
+    #    com.nci.tkb.ui.activity.main.HomeActivity    com.nci.tkb.ui.activity.user.LoginActivity
+    Sleep    3
+    #取消
+    Click Element    android:id/button1
+    Sleep    2
+    #点登录
+    Comment    Click Element    id=com.nci.tkb:id/tv_login
+    Comment    #    手机号
+    Comment    Input Text    id=com.nci.tkb:id/username    13265435525
+    Comment    Input Text    id=com.nci.tkb:id/captcha    111111
+    Comment    Sleep    1
+    Comment    #    获取验证码
+    Comment    Click Element    com.nci.tkb:id/get_captcha
+    Comment    Sleep    5
+    Comment    #    登录
+    Comment    Click Element    com.nci.tkb:id/next
+    Comment    Sleep    15
+    #直接循环有问题，    第二次循环时不需要连接蓝牙了
+    Repeat Keyword    10    公交充值
+    Comment    Repeat Keyword    10    免蓝牙
+    Comment    公交充值
+
+无NFC新启动app
+    [Documentation]    每次启动都重新安装一次，则需要每次都登录
+    #R9S
+    Comment    Open Application    http://localhost:4723/wd/hub    platformName=Android    platformVersion=4.4.4    deviceName=bdefdc13
+    #OPPO
+    Open Application    http://localhost:4723/wd/hub    platformName=Android    platformVersion=4.4.4    deviceName=93f42dca
+    Comment    Sleep    15
+    Start Activity    com.nci.tkb    com.nci.tkb.ui.activity.welcome.WelcomeActivity2
+    #    com.nci.tkb.ui.activity.main.HomeActivity    com.nci.tkb.ui.activity.user.LoginActivity
+    Sleep    3
+    Swipe    1000    300    400    300    800
+    Sleep    2
+    Swipe    1000    300    400    300    800
+    Sleep    2
+    Swipe    1000    300    400    300    800
+    Sleep    3
+    #
+    #    判断是否有新版本
+    #
+    ${text}    Get Text    android:id/button1
+    log    ${text}
+    #    临时这样    因为有更新
+    Click Element    android:id/button1
+    Click Element    id=com.nci.tkb:id/tv_login
+    #    手机号
+    Input Text    id=com.nci.tkb:id/username    13265435525
+    Input Text    id=com.nci.tkb:id/captcha    111111
+    Sleep    1
+    #    获取验证码
+    Click Element    com.nci.tkb:id/get_captcha
+    Sleep    5
+    #    登录
+    Click Element    com.nci.tkb:id/next
+    Sleep    15
+
+NFC直接启动
+    #oppo
+    Open Application    http://localhost:4723/wd/hub    platformName=Android    platformVersion=4.4.4    deviceName=93f42dca
+    Comment    Sleep    15
+    Start Activity    com.nci.tkb    com.nci.tkb.ui.activity.welcome.WelcomeActivity2
+    #    com.nci.tkb.ui.activity.main.HomeActivity    com.nci.tkb.ui.activity.user.LoginActivity
+    Sleep    3
+    #取消
+    Click Element    android:id/button1
+    Sleep    2
+    #直接循环有问题，    第二次循环时不需要连接蓝牙了
+    Comment    Repeat Keyword    10    公交充值
+    Comment    Repeat Keyword    10    免蓝牙
+    公交充值
+
+*** Keywords ***
+公交充值
+    #公交卡充值
+    Click Element    com.nci.tkb:id/main_btn_gjk_icon
+    Sleep    2
+    #点击蓝牙
+    Click Element    com.nci.tkb:id/bt_icon
+    Sleep    1
+    #点击连接蓝牙刷卡器
+    Click Element    android:id/button2
+    #连接蓝牙    一直等到下单的页面
+    Wait Until Page Contains Element    //android.support.v7.widget.RecyclerView/android.widget.RadioButton[1]    40
+    #选择金额下单
+    Click Element    //android.support.v7.widget.RecyclerView/android.widget.RadioButton[1]    #选择第一个
+    Sleep    1
+    #下单    立即充值
+    Click Element    com.nci.tkb:id/confirm
+    sleep    5
+    Comment    #微信支付
+    Comment    Click Element    //android.widget.TextView[@text='微信支付']
+    Comment    sleep    3
+    Comment    #支付
+    Comment    Click Element    com.tencent.mm:id/dxu
+    Comment    #输入密码
+    Comment    Input Text    com.tencent.mm:id/cj0    147258
+    Comment    sleep    5
+    Comment    #返回商家
+    Comment    Click Element    com.tencent.mm:id/dr3
+    Comment    #等待充值成功
+    Comment    Wait Until Page Contains Element    com.nci.tkb:id/status    40    #充值成功
+    Comment    ${text}    Get Text    com.nci.tkb:id/status
+    Comment    log    ${text}
+    #返回
+    Click Element    com.nci.tkb:id/baricon
+    sleep    10
+
+免蓝牙
+    #公交卡充值
+    Click Element    com.nci.tkb:id/main_btn_gjk_icon
+    Sleep    2
+    #连接蓝牙    一直等到下单的页面
+    Wait Until Page Contains Element    //android.support.v7.widget.RecyclerView/android.widget.RadioButton[1]    40
+    #选择金额下单
+    Click Element    //android.support.v7.widget.RecyclerView/android.widget.RadioButton[1]    #选择第一个
+    Sleep    1
+    #下单    立即充值
+    Click Element    com.nci.tkb:id/confirm
+    sleep    2
+    Comment    #微信支付
+    Comment    Click Element    //android.widget.TextView[@text='微信支付']
+    Comment    sleep    3
+    Comment    #支付
+    Comment    Click Element    com.tencent.mm:id/dxu
+    Comment    #输入密码
+    Comment    Input Text    com.tencent.mm:id/cj0    147258
+    Comment    sleep    5
+    Comment    #返回商家
+    Comment    Click Element    com.tencent.mm:id/dr3
+    Comment    #等待充值成功
+    Comment    Wait Until Page Contains Element    com.nci.tkb:id/status    40    #充值成功
+    Comment    ${text}    Get Text    com.nci.tkb:id/status
+    Comment    log    ${text}
+    #返回
+    Click Element    com.nci.tkb:id/baricon
+    sleep    3

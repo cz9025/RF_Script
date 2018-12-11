@@ -1,0 +1,20 @@
+*** Settings ***
+Library           DatabaseLibrary
+Library           Collections
+
+*** Test Cases ***
+连接数据库测试
+    #    为什么要写成pymysql
+    Connect To Database Using Custom Params    pymysql    database='world', user='root', password='123456', host='127.0.0.1', port=3306
+    #Connect To Database    pymysql    dbName='world'    dbUsername='root'    dbPassword='123456'    dbHost='127.0.0.1'    dbPort=3306
+    Table Must Exist    city
+    #    找出城市名为深圳的
+    ${query}    Query    SELECT * from city WHERE Name='ShenZhen'
+    log    ${query}
+    ${query1}    Query    SELECT * from city WHERE Name LIKE \ '%Sh%'
+    log    ${query1}
+    Disconnect From Database
+    ${li}    Get From List    ${query}    0
+    log    ${li}
+    ${li2}    Get From List    ${li}    1
+    log    ${li2}

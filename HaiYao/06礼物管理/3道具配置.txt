@@ -1,0 +1,190 @@
+*** Settings ***
+Documentation     修改道具，做到能独立运行，
+...
+...               思路：
+...
+...               先找出自己添加的，前提是在第一页要有自己添加的数据，要确保道具在10条以内
+...
+...               删除同理
+...
+...
+...               本用例包含了新增道具、修改道具、删除道具（批量）、查找道具（名称、ID）
+Suite Setup       登录
+Suite Teardown    关闭浏览器
+Test Teardown
+Library           Selenium2Library
+Resource          ../Resources/常用操作.txt
+Resource          ../Resources/系统配置.txt
+Resource          ../Resources/BaseData.txt
+Library           AutoItLibrary
+
+*** Test Cases ***
+添加道具
+    Comment    点击礼物管理
+    等待时间    3
+    Click Element    xpath=//span[text()="礼物管理"]
+    等待时间    1
+    Comment    点击道具配置
+    Click Element    xpath=//p[text()="道具配置"]
+    等待时间    3
+    ${名称}    随机字符    ${name.a}    8
+    道具添加    ${名称}
+    #校验
+    按道具名称查询    ${名称}
+    结果校验    1
+    礼物状态校验    ${名称}    6    禁用
+
+修改道具
+    #先刷新页面    为了能独立运行和连续运行
+    Reload Page
+    Wait Until Page Contains Element    xpath=//span[text()="礼物管理"]
+    Click Element    xpath=//span[text()="礼物管理"]
+    等待时间    2
+    Click Element    xpath=//p[text()="道具配置"]
+    名称修改-删除    1
+    ##################    修改页面
+    Comment    道具名称
+    ${名称}    随机字符    ${name.u}    8
+    道具添加-修改    ${名称}
+    等待时间    3
+    ##################
+    #校验
+    Input Text    xpath=//input[@ng-model="reportData.name"]    ${名称}
+    等待时间    1
+    #查询
+    Click Button    xpath=//button[@ng-if="btn.query"]
+    等待时间    3
+    结果校验    1
+    礼物状态校验    ${名称}    6    禁用
+
+删除道具
+    #先刷新页面    为了能独立运行和连续运行
+    Reload Page
+    Wait Until Page Contains Element    xpath=//span[text()="礼物管理"]
+    Comment    点击礼物管理
+    等待时间    3
+    Click Element    xpath=//span[text()="礼物管理"]
+    等待时间    1
+    Comment    点击道具配置
+    Click Element    xpath=//p[text()="道具配置"]
+    等待时间    3
+    #找到自己添加的    如果当前页没有的话会有问题
+    ${道具名称}    名称修改-删除    2
+    等待时间    1
+    #处理删除对话框
+    Click Element    xpath=//div[@class="delete"]/div[2]/button[2]
+    等待时间    3
+    #校验
+    Input Text    xpath=//input[@ng-model="reportData.name"]    ${道具名称}
+    等待时间    1
+    #查询
+    Click Button    xpath=//button[@ng-if="btn.query"]
+    结果校验    0
+
+按ID查找
+    #先刷新页面    为了能独立运行和连续运行
+    Reload Page
+    Wait Until Page Contains Element    xpath=//span[text()="礼物管理"]
+    Comment    点击礼物管理
+    等待时间    3
+    Click Element    xpath=//span[text()="礼物管理"]
+    等待时间    1
+    Comment    点击道具配置
+    Click Element    xpath=//p[text()="道具配置"]
+    等待时间    3
+    #直接按第一条ID查找
+    ${id}    Get Text    xpath=//div[@class="box-content"]/table/tbody/tr[1]/td[2]
+    Input Text    xpath=//input[@ng-model="reportData.id"]    ${id}
+    等待时间    1
+    #查询
+    Click Button    xpath=//button[@ng-if="btn.query"]
+    结果校验    1
+
+批量删除
+    Reload Page
+    Wait Until Page Contains Element    xpath=//span[text()="礼物管理"]
+    Comment    点击礼物管理
+    等待时间    3
+    Click Element    xpath=//span[text()="礼物管理"]
+    等待时间    1
+    Comment    点击道具配置
+    Click Element    xpath=//p[text()="道具配置"]
+    等待时间    3
+    ${num}    Evaluate    random.randint(2,5)    modules=random
+    ${名称}    随机字符    【道具名称待删】    8
+    Repeat Keyword    ${num}    道具添加    ${名称}
+    Sleep    2
+    #查询
+    按道具名称查询    ${名称}
+    Sleep    2
+    ${n}    Get Matching Xpath Count    xpath=//div[@class="box-content"]/table/thead/tr
+    Run Keyword If    ${n}<${num}    Fail    添加的数据数量不对，应该添加${num}个，实际${n}个
+    Sleep    1
+    Comment    全选
+    Click Element    xpath=//div[@class="box-content"]/table/thead/tr/th[1]/input
+    等待时间    1
+    #点击删除
+    Click Element    xpath=//button[text()="删除"]
+    等待时间    2
+    #处理删除对话框
+    确认删除
+    Sleep    2
+    按道具名称查询    ${名称}
+    结果校验    0
+
+*** Keywords ***
+道具添加
+    [Arguments]    ${名称}
+    [Documentation]    适用于批量删除操作
+    Comment    添加道具
+    Click Element    xpath=//div[text()="添加道具"]
+    等待时间    3
+    道具添加-修改    ${名称}
+    等待时间    1
+
+道具添加-修改
+    [Arguments]    ${名称}
+    Comment    道具名称
+    Input Text    xpath=//div[@class="edit_course"]//div[@class="modalContent"]/form//label[starts-with(text(),"道具名称：")]/following-sibling::input    ${名称}
+    等待时间    1
+    Comment    道具标识
+    ${rand}    随机数    1    99999
+    Input Text    xpath=//div[@class="edit_course"]//div[@class="modalContent"]/form//label[starts-with(text(),"道具标识：")]/following-sibling::input    ${rand}
+    等待时间    1
+    #下面两个只有添加才有的
+    #类型
+    Run Keyword If    "${name.a}" in "${名称}"    Select From List By Value    //div[@class="edit_course"]//div[@class="modalContent"]/form//label[starts-with(text(),"类型:")]/following-sibling::select    0
+    等待时间    1
+    #游戏类型
+    Run Keyword If    "${name.a}" in "${名称}"    Click Element    xpath=//div[@class="edit_course"]//div[@class="modalContent"]/form//label[starts-with(text(),"游戏类型：")]/following-sibling::input[1]
+    等待时间    1
+    Comment    小图标
+    Click Element    xpath=//div[@class="edit_course"]//div[@class="modalContent"]/form//label[starts-with(text(),"小图标：")]/span[2]
+    等待时间    1
+    Control Send    打开    ${EMPTY}    [CLASS:Edit; INSTANCE:1]    E:\\pic117.png
+    等待时间    1
+    Control Click    打开    ${EMPTY}    Button1    LEFT
+    等待时间    2
+    Comment    动画
+    Click Element    xpath=//div[@class="edit_course"]//div[@class="modalContent"]/form//label[starts-with(text(),"动画：")]/span[1]
+    等待时间    1
+    Control Send    打开    ${EMPTY}    [CLASS:Edit; INSTANCE:1]    E:\\swf.swf
+    等待时间    1
+    Control Click    打开    ${EMPTY}    Button1    LEFT
+    等待时间    2
+    Comment    道具描述
+    ${text}    随机字符    ${desc.a}    40
+    Input Text    xpath=//div[@class="edit_course"]//div[@class="modalContent"]/form//label[starts-with(text(),"道具描述：")]/following-sibling::textarea    ${text}
+    等待时间    1
+    #禁用
+    Click Element    xpath=//div[@class="edit_course"]//div[@class="modalContent"]/form//label[starts-with(text(),"状态：")]/following-sibling::div[2]
+    #保存
+    Click Button    xpath=//div[@class="edit_course"]//div[@class="modalContent"]/form//button
+    等待时间    1
+
+按道具名称查询
+    [Arguments]    ${名称}
+    Input Text    xpath=//input[@ng-model="reportData.name"]    ${名称}
+    #查询
+    Click Button    xpath=//button[@ng-if="btn.query"]
+    等待时间    2

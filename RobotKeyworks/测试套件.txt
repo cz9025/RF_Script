@@ -1,0 +1,37 @@
+*** Settings ***
+Suite Teardown
+Library           Selenium2Library
+Library           Collections
+Library           AutoItLibrary
+Variables         fun.py
+
+*** Variables ***
+
+*** Test Cases ***
+02使用本地文件
+    log    调用本地py文件，注意是左斜杠
+    Import Library    ${CURDIR}/fun.py
+    ${a}    Evaluate    int(4)
+    ${b}    Evaluate    int(5)
+    ${add}    add    4    5
+    log    ${add}
+    Comment    这也是注释
+    ${list1}    Create List    a    b    c
+    ${list2}    Create List    d    e    f
+    #在list1后面添加list2
+    extend_to_list    ${list1}    ${list2}
+    log    ${list1}
+
+02计算器
+    [Tags]    计算器
+    Run    calc.exe
+    ${title}    Win Get Title    计算器
+    log    ${title}
+    Wait For Active Window    计算器
+    Control Click    计算器    \    Button4    #4
+    Control Click    计算器    \    Button10    #4
+    Control Click    计算器    \    Button23    #+
+    Control Click    计算器    \    Button4    #4
+    Control Click    计算器    \    Button15    #4
+    Control Click    计算器    \    Button28    #=
+    Win Close    计算器

@@ -1,0 +1,2 @@
+*** Settings ***
+Documentation     说明：每条用例执行时，都要让他从首页开始

@@ -1,0 +1,197 @@
+*** Settings ***
+Suite Teardown    关闭浏览器
+Library           Selenium2Library
+Resource          ../baidu.robot
+
+*** Test Cases ***
+重点切换浏览器
+    #实现浏览器的切换
+    ${id1}    Open Browser    ${baidu}    chrome
+    Maximize Browser Window
+    Set Browser Implicit Wait    20
+    Input Text    id=kw    ${cz}
+    Sleep    1
+    #清除内容
+    Clear Element Text    id=kw
+    Sleep    1
+    Input Text    id=kw    ${cz}
+    Sleep    1
+    #获取元素的属性
+    ${elementattr}    Get Element Attribute    id=kw@name
+    log    hhh::::${elementattr}
+    Click Element    id=su
+    Sleep    3
+    #校验元素是否包含该内容
+    ${mg}    Element Should Contain    //div[@id='content_left']/div/h3/a    9025
+    log    ${mg}
+    Sleep    2
+    ${title}    Get Title
+    log    ${title}
+    Assign Id To Element    //div[@id='content_left']/div/h3/a    mdzz
+    #如果页面重新加载则标记不起作用
+    #Reload Page
+    Sleep    5
+    Page Should Contain Element    mdzz
+    Sleep    5
+    #新打开浏览器
+    ${id3}    Open Browser    ${baidu}    chrome
+    Maximize Browser Window
+    Set Browser Implicit Wait    20
+    Input Text    id=kw    ${cz}
+    Sleep    1
+    Click Element    id=su
+    Sleep    5
+    #重新创建一个句柄
+    ${service args}=    Create List    --proxy=localhost:8888
+    ${id2}    Create Webdriver    Chrome    service_args=${service args}
+    Maximize Browser Window
+    Sleep    1
+    Go To    ${baidu}
+    Wait Until Page Contains Element    id=kw
+    Input Text    id=kw    ${cz}
+    Sleep    1
+    Click Button    id=su
+    Sleep    1
+    #切换浏览器
+    Switch Browser    ${id1}
+    Sleep    1
+    Wait Until Page Contains Element    //div[@id='content_left']/div/h3/a
+    Switch Browser    ${id2}
+    Wait Until Page Contains Element    id=su
+    Sleep    5
+    #切换浏览器
+    Switch Browser    ${id3}
+    Sleep    1
+    Wait Until Page Contains Element    //div[@id='content_left']/div/h3/a
+    Sleep    5
+    #
+    ${windows}    List Windows
+    log    ${windows}
+
+Ele_Content
+    Open Browser    ${baidu}    chrome
+    Maximize Browser Window
+    Set Browser Implicit Wait    20
+    Input Text    id=kw    ${cz}
+    Sleep    1
+    Click Element    id=su
+    Sleep    5
+    #元素可视
+    Element Should Be Visible    id=su    没有找到
+    #获得所有cookies
+    ${cook}    Get Cookies
+    log    ${cook}
+    #添加缓存
+    Add Cookie    cheng    zheng
+    ${cook}    Get Cookies
+    log    ${cook}
+    #删除指定缓存
+    Delete Cookie    cheng
+    ${cook}    Get Cookies
+    log    ${cook}
+    #删除所有缓存
+    Delete All Cookies
+    ${cook}    Get Cookies
+    log    ${cook}
+
+页面元素
+    Open Browser    ${baidu}    chrome
+    Maximize Browser Window
+    Set Browser Implicit Wait    20
+    Wait Until Page Contains Element    //div[@id="u1"]/a[1]
+    #拖动元素不起作用    ？？？？？
+    Drag And Drop    //*[@id="u1"]/a[1]    //input[@id='kw']
+    Sleep    2
+    #移动元素位置
+    Drag And Drop By Offset    //div[@id="u1"]/a[1]    100    1
+    #获得所有链接的ID
+    ${six}    Get All Links
+    log    ${six}
+    #获得元素的属性值    @后面接属性名
+    ${attribute}    Get Element Attribute    //*[@id="u1"]/a[1]@href
+    log    ${attribute}
+    #获得元素大小
+    ${size}    Get Element Size    //*[@id="u1"]/a[1]
+    log    ${size}
+    #获得元素的水平位置
+    ${position}    Get Horizontal Position    //*[@id="u1"]/a[1]
+    log    ${position}
+    #获得垂直位置
+    ${vertical}    Get Vertical Position    //*[@id="u1"]/a[1]
+    log    ${vertical}
+    #
+    #${items}    Get List Items
+    #log    ${items}
+    #返回当前位置
+    ${location}    get Location
+    log    ${location}
+    #获得元素数量
+    ${count}    Get Matching Xpath Count    //*[@id="u1"]/a
+    log    ${count}
+    #等待、超时时间
+    ${wait}    Get Selenium Implicit Wait
+    ${speed}    Get Selenium Speed
+    ${timeout}    Get Selenium Timeout
+    log    ${wait}:${speed}:${timeout}
+    #获得页面源文件
+    ${source}    Get Source
+    log    ${source}
+    #获得元素的文本
+    ${text}    Get Text    //*[@id="u1"]/a[1]
+    log    ${text}
+    #获得页面的标题
+    ${title}    Get Title
+    log    ${title}
+    #获得元素的值
+    ${value}    Get Value    //*[@id="u1"]/a[1]
+    log    ${value}
+    #
+    ${webelement}    Get Webelement    //*[@id="u1"]/a[1]
+    log    ${webelement}
+    #不会用
+    ${ids}    Get Window Identifiers
+    log    ${ids}
+    #获得窗口名字
+    ${name}    Get Window Names
+    ${position}    Get Window Position
+    ${size}    Get Window Size
+    #获得窗口标题
+    ${titles}    Get Window Titles
+    log    ${name}:${position}:${size}:${titles}
+    #跳转链接
+    Go To    ${baidu}
+    Wait Until Page Contains Element    //*[@id="u1"]/a[1]
+    Input Text    kw    cz9025
+    Click Element    su
+    Sleep    5
+    #后退
+    Go Back
+    Sleep    5
+    #输入的文本放入警告框中    这个好像没发测试
+    #Input Text Into Prompt    这回警告吗
+    #Sleep    5
+
+比较
+    #设置在每个Selenium命令之后等待的秒数    用于减慢测试执行，以便能够查看执行情况
+    Set Selenium Speed    2
+    百度搜索    cz9025
+    #xpath出现的个数
+    Xpath Should Match X Times    //input[@id='kw']    2
+    #比较地址    拿当前打开的地址比
+    #Location Should Be    ${baidu}
+    Location Should Contain    9025
+    #给定的元素页面出现的次数
+    Locator Should Match X Times    id=su    1
+    ${location}    Log Location
+    log    ${location}
+    #打印网页源码
+    ${source}    Log Source
+    log    ${source}
+    ${title}    Log Title
+    log    ${title}
+    #    会右击？？？
+    Open Context Menu    id=su
+    Sleep    2
+    #    不会用
+    #Page Should Contain Textfield    id=su
+    Sleep    5

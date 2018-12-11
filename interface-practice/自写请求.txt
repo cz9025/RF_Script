@@ -1,0 +1,281 @@
+*** Settings ***
+Library           RequestsLibrary
+Library           String
+Library           Collections
+Library           json
+Variables         myfun.py
+
+*** Variables ***
+${afd}            http://api.avatardata.cn
+${baidu}          http://apis.baidu.com
+
+*** Test Cases ***
+验证码
+    #    http://weixin35.bydauto.com.cn/index.php?m=Web&c=Login&a=verify    Content-Type:text/html
+    &{params}=    Create Dictionary    m=Web    c=Login    a=verify
+    Create Session    uri    http://weixin35.bydauto.com.cn
+    ${heards}    Create Dictionary    Content-Type=image/png
+    ${test2}    Get Request    uri    /index.php    headers=${heards}    params=${params}
+    Should Be Equal As Strings    ${test2.status_code}    200
+    log    ${test2.content}
+    log    ${test2.text}
+    Delete All Sessions
+
+请求1
+    ${headers}=    Create dictionary    Content-Type=application/x-www-form-urlencoded
+    RequestsLibrary.Create Session    rfs    http://www.robotframework.net
+    ${login_info}    Set Variable    {'user_name': 'cz9025', 'password': 'robotframework'}
+    ${dic_data2}    evaluate    dict(${login_info})
+    ${login}    RequestsLibrary.Post    rfs    /account/login    data=${dic_data2}    headers=${headers}
+    Log Many    ${login.content}
+    RequestsLibrary.Create Session    rfs-article    http://article.www.robotframework.net    headers=${headers}    cookies=${login.cookies}
+    ${search_info}    Set Variable    {'v_sn': '1.3.0','os': '', 'search': '搜索','pageid': '50'}
+    ${search_info2}    evaluate    dict(${search_info})
+    ${res}    RequestsLibrary.Post    rfs-article    /publish/article    data=${search_info2}    headers=${headers}
+    Log Many    ${res.content}
+
+天气
+    #key    0c28a23668d45711dace279120dc2301
+    Create Session    uri    ${baidu}
+    ${headers}    Create Dictionary    apikey=0c28a23668d45711dace279120dc2301
+    &{params}    Create Dictionary    area=101010100
+    ${test}    Get Request    uri    /tianyiweather/basicforecast/weatherapi?    headers=${headers}    params=${params}
+    log    返回的内容：：${test.content}.decode(utf-8)
+    ${loadss}    loads    ${test.content}    encoding=utf-8
+    log    loadss:::${loadss}
+    ${responsedata}    To Json    ${test.content}
+    log    ${responsedata}
+    ${keys}    Get Dictionary Keys    ${responsedata}
+    log    ${keys}
+    @{weather}    Get From Dictionary    ${responsedata}    alarm
+    log    weather:::${weather}
+
+天气02
+    #    阿凡达数据
+    #    http://api.avatardata.cn/Weather/Query
+    Create Session    uri    ${afd}
+    &{params}    Create Dictionary    key=ec264b7e6b2e4a87a5012f1ee59aa979    cityname=%E7%9B%8A%E9%98%B3    dtype=JSON    format=true
+    ${test}    Get Request    uri    /Weather/Query    params=&{params}
+    Should Be Equal As Strings    ${test.status_code}    200
+    log    ${test.content}
+    ${responsedata}    To Json    ${test.content}
+    ${error_code}    Get From Dictionary    ${responsedata}    error_code
+    Should Be Equal As Strings    ${error_code}    0    #错误码
+    log    success!!!
+
+百度的
+    Create Session    uri    http://www.baidu.com
+    ${heards}    Create Dictionary    Content-Type=text/html
+    ${params}    Create Dictionary    ie=UTF-8    wd=cz9025
+    ${test}    Get Request    uri    /s    headers=${heards}    params=${params}
+    Should Be Equal As Strings    ${test.status_code}    200
+    log    sss::::${test.content}
+
+违章查询
+    #key    0c28a23668d45711dace279120dc2301
+    Create Session    uri    http://apis.baidu.com
+    ${headers}    Create Dictionary    apikey=0c28a23668d45711dace279120dc2301
+    &{params}    Create Dictionary    carorg=shenzhen    lsprefix=粤    lsnum=B3C97R    frameno=J06799    engineno=55B30A
+    ${test}    Get Request    uri    /netpopo/illegal/illegal    headers=${headers}    params=${params}
+    log    返回的内容：：${test.content}
+    ${responsedata}    To Json    ${test.content}
+    log    responsedata:::${responsedata}
+    ${keys}    Get Dictionary Keys    ${responsedata}
+    log    ${keys}
+    ${loads}    Loads    ${test.content}
+    log    loads:::${loads}
+
+登录
+    #key    0c28a23668d45711dace279120dc2301
+    Create Session    uri    http://weixin35.auto.com.cn
+    &{params}    Create Dictionary    m=web
+    ${test}    Get Request    uri    /index.php?    params=${params}
+    log    返回的内容：：${test.content}
+    ${responsedata}    To Json    ${test.content}
+    log    ${responsedata}
+    ${keys}    Get Dictionary Keys    ${responsedata}
+    log    ${keys}
+
+IP地址查询
+    #key    0c28a23668d45711dace279120dc2301
+    Create Session    uri    http://apis.baidu.com
+    ${headers}    Create Dictionary    apikey=0c28a23668d45711dace279120dc2301
+    &{params}    Create Dictionary    ip=192.168.1.102
+    ${test}    Get Request    uri    /apistore/iplookup/iplookup_paid    headers=${headers}    params=${params}
+    log    返回的内容：：${test.content}
+    ${loadss}    loads    ${test.content}    encoding=utf-8
+    log    loadss:::${loadss}
+    ${responsedata}    To Json    ${test.content}
+    log    ${responsedata}
+    ${keys}    Get Dictionary Keys    ${responsedata}
+    log    ${keys}
+    #这个要钱的，用不了
+
+笑话大全
+    #    89df86d591b44d449725fc5b8ccac350
+    Import Library    ${CURDIR}/myfun.py
+    Create Session    url    http://api.avatardata.cn
+    #将时间转换为毫秒
+    ${time}    Get Time    epoch
+    ${params}    Create Dictionary    key=89df86d591b44d449725fc5b8ccac350    time=${time}    sort=desc    page=1    rows=20
+    ${result}    Post Request    url    /Joke/QueryJokeByTime?    params=${params}
+    Should Be Equal As Strings    ${result.status_code}    200
+    #
+    ${respone}    Loads    ${result.content}
+    log    result:::${result.json()}
+    #错误码
+    ${error_code}    Get From Dictionary    ${respone}    error_code
+    Run Keyword If    ${error_code}!=0    Fail    接口返回异常!!!
+    #
+    ${ss}    Mdecode    ${result.content}    utf-8
+    log    ${ss}
+    #
+    ${result}    Get From Dictionary    ${respone}    result
+    ${len}    Evaluate    len(${result})
+    : FOR    ${cont}    IN RANGE    ${len}
+    \    ${content}    Get From Dictionary    ${result[${cont}]}    content
+    \    log    ${content}
+
+历史上的今天
+    #    91a95bc6c6d5400e9bc2fd3d796d7fc7
+    Import Library    ${CURDIR}/myfun.py
+    Create Session    url    ${afd}
+    #${time}    Set Variable    ${time_now}
+    ${yue}    Get Time    month    NOW
+    ${ri}    Get Time    day    NOW
+    log    ${yue}:${ri}
+    ${headers}    Create Dictionary    Accept=application/xml    Content-Type=application/json    #可不要
+    ${params}    Create Dictionary    key=91a95bc6c6d5400e9bc2fd3d796d7fc7    yue=${yue}    ri=${ri}    type=1    page=1
+    ${result}    Get Request    url    /HistoryToday/LookUp    params=${params}    headers=${headers}
+    Should Be Equal As Strings    ${result.status_code}    200
+    ${respone}    Loads    ${result.content}
+    log    ${respone}
+    ${error_code}    Get From Dictionary    ${respone}    error_code
+    Run Keyword If    ${error_code}!=0    Fail    接口返回异常！！！
+    #Should Be Equal As Strings    ${error_code}    0
+    log    success!!!
+    #转换编码
+    #${ss}    Mdecode    ${result.content}    utf-8
+    #log    ${ss}
+    #处理返回的结果
+    ${keys}    Get Dictionary Keys    ${respone}
+    ${内容}    Get From Dictionary    ${respone}    result
+    ${len}    Evaluate    len(${内容})
+    #
+    : FOR    ${i}    IN RANGE    ${len}
+    \    log    ${内容[${i}]}    #打印每一条的内容
+    \    #    其实列表中的每一条数据就是字典格式的
+    \    ${res1}    Copy Dictionary    ${内容[${i}]}
+    \    ${year}    Get From Dictionary    ${res1}    year    #标题
+    \    ${title}    Get From Dictionary    ${res1}    title    #标题
+    \    log    ${year}:::${title}
+
+健康菜谱
+    [Documentation]    u'description': u'\u5fc3\u810f',
+    ...    \ \ \ \ \ \ \ \ \ \ u'seq': 0,
+    ...    \ \ \ \ \ \ \ \ \ u'title': u'\u5fc3\u810f',
+    ...    \ \ \ \ \ \ \ \ u'cookclass': 0,
+    ...    \ \ \ \ \ \ \ u'keywords': u'\u5fc3\u810f',
+    ...    \ \ \ \ \ \ u'id': 188,
+    ...    \ \ \ \ \ u'name': u'\u5fc3\u810f'
+    ...
+    ...
+    ...    {1: u'\u7f8e\u5bb9', 10: u'\u51cf\u80a5', 15: u'\u4fdd\u5065\u517b\u751f', 52: u'\u4eba\u7fa4', 62: u'\u65f6\u8282', 68: u'\u9910\u65f6', 75: u'\u5668\u5b98', 82: u'\u8c03\u517b', 98: u'\u80a0\u80c3\u6d88\u5316', 112: u'\u5b55\u4ea7\u54fa\u4e73', 132: u'\u5176\u4ed6', 147: u'\u7ecf\u671f', 161: u'\u5973\u6027\u75be\u75c5', 166: u'\u547c\u5438\u9053', 182: u'\u8840\u7ba1', 188: u'\u5fc3\u810f', 192: u'\u809d\u80c6\u813e\u80f0', 197: u'\u795e\u7ecf\u7cfb\u7edf', 202: u'\u53e3\u8154', 205: u'\u808c\u8089\u9aa8\u9abc', 212: u'\u76ae\u80a4', 218: u'\u7537\u6027', 227: u'\u764c\u75c7'}
+    #菜谱分类    1823828c3aeb47f991559e8c97332c81
+    Create Session    uri    ${afd}
+    ${params}    Create Dictionary    key=1823828c3aeb47f991559e8c97332c81    id=0    dtype=JSON    format=true
+    ${headers}    Create Dictionary    Accept=text/html    Content-Type=application/json
+    ${result}    Post Request    uri    /Cook/CookClass    params=${params}    headers=${headers}
+    Should Be Equal As Strings    ${result.status_code}    200
+    ${response}    Loads    ${result.content}    utf-8
+    #
+    ${error_code}    Get From Dictionary    ${response}    error_code
+    Run Keyword If    ${error_code}!=0    Fail    接口返回异常！！！
+    #
+    ${centent}    Get From Dictionary    ${response}    result
+    #有23条
+    ${len}    Get Length    ${centent}
+    ${id_list}    Create List
+    ${id_keywords}    Create Dictionary
+    : FOR    ${i}    IN RANGE    ${len}
+    \    ${items}    Copy Dictionary    ${centent[${i}]}
+    \    ${keywords}    Get From Dictionary    ${items}    keywords
+    \    ${id}    Get From Dictionary    ${items}    id
+    \    获取菜谱列表    ${id}
+    \    Set To Dictionary    ${id_keywords}    ${id}    ${keywords}
+    Set Global Variable    ${id_keywords}
+
+国际新闻
+    #国际新闻
+    Create Session    uri    ${afd}
+    ${headers}    Create Dictionary    Accept=application/xml    Content-Type=application/x-www-form-urlencoded    #可不要
+    ${params}    Create Dictionary    key=03c60f405b6348d08e65ed619f68bf7c    rows=20    page=1
+    ${result}    Post Request    uri    /WorldNews/Query?    params=${params}    headers=${headers}
+    Should Be Equal As Strings    ${result.status_code}    200
+    log    ${result.content}
+    ${respone}    Loads    ${result.content}
+    ${error_code}    Get From Dictionary    ${respone}    error_code
+    ${reason}    Get From Dictionary    ${respone}    reason
+    Run Keyword If    ${error_code}!=0    Fail    ${reason}
+
+*** Keywords ***
+获取菜谱列表
+    [Arguments]    ${id_i}
+    [Documentation]    {
+    ...    \ \ u'count': 20352,
+    ...    \ u'keywords': u'\u71d5\u7a9d\u7eaf\u51c0\u6c34\u81a8\u80c0\u51b0\u7cd6\u6e05\u6d17',
+    ...    u'name': u'\u51b0\u7cd6\u71d5\u7a9d',
+    ...    u'img': u'http: //api.avatardata.cn/Cook/Img?file=ee2c6741dad94274a431947f7622feb4.jpg',
+    ...    u'food': u'\u5e72\u8840\u71d5\u71d5\u7a9d,
+    ...    \u51b0\u7cd6',
+    ...    u'id': 183,
+    ...    u'description': u'7\uff09\u52a0\u76d6\uff0c\u7f6e\u4e8e\u84b8\u9505\u5185\uff0c\u9694\u6c34\u4ee5\u6587\u706b\u70962\u4e2a\u5c0f\u65f6\uff0c\u4ee5\u8868\u9762\u5448\u73b0\u5c11\u91cf\u6ce1\u6cab\uff0c\u6709\u70b9\u6cb8\u817e\u3001\u7c98\u7a20\u611f\u548c\u86cb\u6e05\u9999\u5473\u4e3a\u84b8\u597d\u7684\u6807\u51c6'
+    ...    }
+    #菜谱列表
+    Create Session    uri    ${afd}
+    ${params}    Create Dictionary    key=1823828c3aeb47f991559e8c97332c81    id=${id_i}    dtype=JSON    format=true
+    ${headers}    Create Dictionary    Accept=text/html    Content-Type=application/json
+    ${result}    Post Request    uri    /Cook/List    params=${params}    headers=${headers}
+    Should Be Equal As Strings    ${result.status_code}    200
+    ${response}    Loads    ${result.content}    utf-8
+    #
+    ${error_code}    Get From Dictionary    ${response}    error_code
+    Run Keyword If    ${error_code}!=0    Fail    接口返回异常！！！
+    #
+    ${centent}    Get From Dictionary    ${response}    result
+    #
+    ${len}    Get Length    ${centent}
+    ${id_keywords}    Create Dictionary
+    : FOR    ${i}    IN RANGE    ${len}
+    \    ${items}    Copy Dictionary    ${centent[${i}]}
+    \    log    菜谱列表
+    \    ${name}    Get From Dictionary    ${items}    name
+    \    ${message}    Get From Dictionary    ${items}    description
+    \    ${id}    Get From Dictionary    ${items}    id
+    \    菜谱详细信息    ${id}
+    \    Set To Dictionary    ${id_keywords}    ${id}    ${name}
+    \    log    ${id_keywords}
+
+菜谱详细信息
+    [Arguments]    ${id_i}
+    #菜谱详细信息
+    Create Session    uri    ${afd}
+    ${params}    Create Dictionary    key=1823828c3aeb47f991559e8c97332c81    id=${id_i}    dtype=JSON    format=true
+    ${headers}    Create Dictionary    Accept=text/html    Content-Type=application/json
+    ${result}    Post Request    uri    /Cook/Show    params=${params}    headers=${headers}
+    Should Be Equal As Strings    ${result.status_code}    200
+    ${response}    Loads    ${result.content}    utf-8
+    #
+    ${error_code}    Get From Dictionary    ${response}    error_code
+    Run Keyword If    ${error_code}!=0    Fail    接口返回异常！！！
+    #数据对象    就是一个字典
+    ${centent}    Get From Dictionary    ${response}    result
+    #
+    ${id_keywords}    Create Dictionary
+    #    把数据对象再传给一个字典
+    ${items}    Copy Dictionary    ${centent}
+    log    菜谱详情
+    ${name}    Get From Dictionary    ${items}    food
+    ${description}    Get From Dictionary    ${items}    description
+    Set To Dictionary    ${id_keywords}    ${name}    ${description}
+    log    ${id_keywords}

@@ -1,0 +1,18 @@
+*** Settings ***
+Library           Selenium2Library
+
+*** Test Cases ***
+模拟百度
+    ${devname}    Create Dictionary    deviceName=Apple iPhone 6
+    ${mobile_emulation}    Create Dictionary    mobileEmulation=${devname}
+    ${chromeoptions}=    Evaluate    sys.modules['selenium.webdriver.chrome.options'].Options()    sys, selenium.webdriver.chrome.options
+    ${chromeoptions._experimental_options}    Set Variable    ${mobile_emulation}
+    #${USER_AGENT}    Create Dictionary    USER_AGENT=Mozilla/5.0 (iPhone; CPU iPhone OS 5_1 like Mac OS X) AppleWebKit/534.46 (KHTML, like Gecko) Mobile/9B176 MicroMessenger/4.3.2    #ios
+    #    Mozilla/5.0 (Linux; U; Android 2.3.6; zh-cn; GT-S5660 Build/GINGERBREAD) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1 MicroMessenger/4.5.255    android
+    Create Webdriver    Chrome    chrome_options=${chromeoptions}    #HTTP_USER_AGENT=${USER_AGENT}
+    Go To    http://www.baidu.com
+    Page Should Contain Element    index-kw
+    Input Text    index-kw    cz9025
+    Sleep    1
+    Click Element    index-bn
+    Close All Browsers

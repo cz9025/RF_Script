@@ -1,0 +1,325 @@
+*** Settings ***
+Suite Setup       登录
+Suite Teardown    关闭浏览器
+Test Teardown
+Library           Selenium2Library
+Library           AutoItLibrary
+Resource          ../Resources/常用操作.txt
+Resource          ../Resources/系统配置.txt
+Resource          ../Resources/BaseData.txt
+
+*** Test Cases ***
+添加活动1
+    Comment    点击新活动管理
+    等待时间    2
+    Click Element    xpath=//span[text()="新活动管理"]
+    等待时间    1
+    Comment    点击新活动中心
+    Click Element    xpath=//p[text()="新活动中心"]
+    等待时间    2
+    Comment    添加活动公告
+    Click Element    xpath=//div[text()="添加活动公告"]
+    等待时间    2
+    Select From List By Value    //select[@ng-model="courseToAdd.activityType"]    3
+    ${活动名称}    随机字符    【名称1】    10
+    Input Text    xpath=//input[@ng-model="courseToAdd.activityName"]    ${活动名称}
+    等待时间    1
+    Comment    活动标识
+    ${flag}    随机数    1000    999999
+    Input Text    xpath=//input[@ng-model="courseToAdd.sign"]    ${flag}
+    等待时间    1
+    Comment    活动状态
+    ${n}    随机数    1    3
+    Click Element    //div[@ng-show="toggleAddCourseView"]/div/div/div/div[5]/div[${n}]
+    等待时间    1
+    Comment    开始时间    选择时间位置有问题
+    Click Element    id=m4311
+    等待时间    1
+    Select Frame    xpath=//iframe[@hidefocus="true"]
+    Comment    开始时间选择今天
+    Click Element    id=dpTodayInput
+    等待时间    1
+    Unselect Frame
+    等待时间    1
+    Comment    结束时间
+    Click Element    id=m4312
+    等待时间    1
+    Select Frame    xpath=//iframe[@hidefocus="true"]
+    Comment    选择最后一个时间
+    Click Element    xpath=//table[@class="WdayTable"]/tbody/tr[last()]/td[last()]
+    等待时间    1
+    Comment    确定
+    Click Element    id=dpOkInput
+    等待时间    1
+    Unselect Frame
+    等待时间    1
+    Comment    活动图片
+    Input Text    xpath=//input[@uploader="uploader"]    E:\\pic117.PNG
+    等待时间    2
+    Comment    活动可用天数
+    Input Text    xpath=//input[@ng-model="courseToAdd.activityDays"]    7
+    等待时间    1
+    Comment    累计登录天数
+    Input Text    xpath=//input[@ng-model="courseToAdd.condition"]    3
+    Comment    奖励
+    奖励活动1    奖励1    1000
+    奖励活动1    奖励2    1001
+    奖励活动1    奖励3    1002
+    Comment    保存
+    Click Element    xpath=//button[@class="save"]
+    等待时间    5
+    查询-活动标识    ${flag}
+
+添加活动2
+    Comment    先刷新页面    不然再次点击左侧列表会隐藏
+    Reload Page
+    Comment    点击新活动管理
+    等待时间    2
+    Click Element    xpath=//span[text()="新活动管理"]
+    等待时间    1
+    Comment    点击新活动中心
+    Click Element    xpath=//p[text()="新活动中心"]
+    等待时间    2
+    Comment    添加活动公告
+    Click Element    xpath=//div[text()="添加活动公告"]
+    等待时间    2
+    Select From List By Value    //select[@ng-model="courseToAdd.activityType"]    4
+    ${活动名称}    随机字符    【名称2】    10
+    Input Text    xpath=//input[@ng-model="courseToAdd.activityName"]    ${活动名称}
+    等待时间    1
+    Comment    活动标识
+    ${n}    随机数    1000    999999
+    Input Text    xpath=//input[@ng-model="courseToAdd.sign"]    ${n}
+    等待时间    1
+    Comment    活动状态
+    ${n}    随机数    1    3
+    Click Element    //div[@ng-show="toggleAddCourseView"]/div/div/div/div[5]/div[${n}]
+    等待时间    1
+    Comment    开始时间    选择时间位置有问题
+    Click Element    id=m4311
+    等待时间    1
+    Select Frame    xpath=//iframe[@hidefocus="true"]
+    Comment    开始时间选择今天
+    Click Element    id=dpTodayInput
+    等待时间    1
+    Unselect Frame
+    等待时间    1
+    Comment    结束时间
+    Click Element    id=m4312
+    等待时间    1
+    Select Frame    xpath=//iframe[@hidefocus="true"]
+    Comment    选择最后一个时间
+    Click Element    xpath=//table[@class="WdayTable"]/tbody/tr[last()]/td[last()]
+    等待时间    1
+    Comment    确定
+    Click Element    id=dpOkInput
+    等待时间    1
+    Unselect Frame
+    等待时间    1
+    Comment    活动图片
+    Input Text    xpath=//input[@uploader="uploader"]    E:\\pic117.PNG
+    等待时间    2
+    Comment    每日开始时间
+    Click Element    id=m4313
+    等待时间    1
+    Select Frame    xpath=//iframe[@hidefocus="true"]
+    Comment    现在时间
+    Click Element    id=dpTodayInput
+    Unselect Frame
+    等待时间    2
+    Comment    每日结束时间
+    Click Element    id=m4314
+    等待时间    1
+    Select Frame    xpath=//iframe[@hidefocus="true"]
+    等待时间    1
+    Comment    时间0：0
+    Input Text    xpath=//input[@class="tB"]    23
+    等待时间    1
+    Input Text    xpath=//input[@class="tE"]    55
+    Comment    确定
+    等待时间    1
+    Click Element    id=dpOkInput
+    Unselect Frame
+    等待时间    1
+    Comment    条件1
+    奖励活动2    奖励1    1    10
+    Comment    条件2
+    奖励活动2    奖励2    2    20
+    Comment    条件3
+    奖励活动2    奖励3    3    30
+    Comment    保存
+    Click Element    xpath=//button[@class="save"]
+    等待时间    5
+    查询-活动名称    ${活动名称}
+
+修改活动1
+    Comment    先刷新页面    不然再次点击左侧列表会隐藏
+    Reload Page
+    Comment    点击新活动管理
+    等待时间    2
+    Click Element    xpath=//span[text()="新活动管理"]
+    等待时间    1
+    Comment    点击新活动中心
+    Click Element    xpath=//p[text()="新活动中心"]
+    等待时间    2
+    Comment    修改活动
+    Focus    //div[@class="box-content"]/table/tbody/tr/td[starts-with( text(),"【名称1】")]/ancestor::tr[1]/td[last()]/a[1]
+    等待时间    1
+    Click Element    //div[@class="box-content"]/table/tbody/tr/td[starts-with( text(),"【名称1】")]/ancestor::tr[1]/td[last()]/a[1]
+    等待时间    2
+    Select From List By Value    //select[@ng-model="courseToEdit.activityType"]    3
+    ${活动名称}    随机字符    【修改1】    10
+    Input Text    xpath=//input[@ng-model="courseToEdit.activityName"]    ${活动名称}
+    等待时间    1
+    Comment    活动状态
+    ${n}    随机数    1    3
+    Click Element    //div[@ng-show="toggleEditCourseView"]/div/div/div/div[5]/div[${n}]
+    等待时间    1
+    Comment    开始时间    选择时间位置有问题
+    Click Element    id=d4312
+    等待时间    1
+    Select Frame    xpath=//iframe[@hidefocus="true"]
+    Comment    开始时间选择今天
+    Click Element    id=dpTodayInput
+    等待时间    1
+    Unselect Frame
+    等待时间    1
+    Comment    结束时间
+    Click Element    id=d4311
+    等待时间    1
+    Select Frame    xpath=//iframe[@hidefocus="true"]
+    Comment    选择最后一个时间
+    Click Element    xpath=//table[@class="WdayTable"]/tbody/tr[last()]/td[last()]
+    等待时间    1
+    Comment    确定
+    Click Element    id=dpOkInput
+    等待时间    1
+    Unselect Frame
+    等待时间    1
+    Comment    活动可用天数
+    Input Text    xpath=//input[@ng-model="courseToEdit.activityDays"]    7
+    等待时间    1
+    Comment    累计登录天数
+    Input Text    xpath=//input[@ng-model="courseToEdit.condition"]    3
+    等待时间    1
+    Comment    保存
+    Click Element    //div[@class="edit_course"]//button[@class="save"]
+    等待时间    4
+    查询-活动名称    ${活动名称}
+
+修改活动2
+    Comment    先刷新页面    不然再次点击左侧列表会隐藏
+    Reload Page
+    Comment    点击新活动管理
+    等待时间    2
+    Click Element    xpath=//span[text()="新活动管理"]
+    等待时间    1
+    Comment    点击新活动中心
+    Click Element    xpath=//p[text()="新活动中心"]
+    等待时间    2
+    Comment    修改活动
+    Focus    //div[@class="box-content"]/table/tbody/tr/td[starts-with( text(),"【名称2】")]/ancestor::tr[1]/td[last()]/a[1]
+    等待时间    1
+    Click Element    //div[@class="box-content"]/table/tbody/tr/td[starts-with( text(),"【名称2】")]/ancestor::tr[1]/td[last()]/a[1]
+    等待时间    2
+    Select From List By Value    //select[@ng-model="courseToEdit.activityType"]    4
+    ${活动名称}    随机字符    【修改2】    10
+    Input Text    xpath=//input[@ng-model="courseToEdit.activityName"]    ${活动名称}
+    等待时间    1
+    Comment    活动状态
+    ${n}    随机数    1    3
+    Click Element    //div[@ng-show="toggleEditCourseView"]/div/div/div/div[5]/div[${n}]
+    等待时间    1
+    Comment    开始时间    选择时间位置有问题
+    Click Element    id=d4312
+    等待时间    1
+    Select Frame    xpath=//iframe[@hidefocus="true"]
+    Comment    开始时间选择今天
+    Click Element    id=dpTodayInput
+    等待时间    1
+    Unselect Frame
+    等待时间    1
+    Comment    结束时间
+    Click Element    id=d4311
+    等待时间    1
+    Select Frame    xpath=//iframe[@hidefocus="true"]
+    Comment    选择最后一个时间
+    Click Element    xpath=//table[@class="WdayTable"]/tbody/tr[last()]/td[last()]
+    等待时间    1
+    Comment    确定
+    Click Element    id=dpOkInput
+    等待时间    1
+    Unselect Frame
+    等待时间    2
+    Comment    每日开始时间
+    Click Element    id=m4315
+    等待时间    1
+    Select Frame    xpath=//iframe[@hidefocus="true"]
+    Comment    现在时间
+    Click Element    id=dpTodayInput
+    Unselect Frame
+    等待时间    2
+    Comment    每日结束时间
+    Click Element    id=m4316
+    等待时间    1
+    Select Frame    xpath=//iframe[@hidefocus="true"]
+    等待时间    1
+    Comment    时间0：0
+    Input Text    xpath=//input[@class="tB"]    23
+    等待时间    1
+    Input Text    xpath=//input[@class="tE"]    55
+    Comment    确定
+    等待时间    1
+    Click Element    id=dpOkInput
+    Unselect Frame
+    等待时间    1
+    Comment    保存
+    Click Element    //div[@class="edit_course"]//button[@class="save"]
+    等待时间    5
+    查询-活动名称    ${活动名称}
+
+*** Keywords ***
+奖励活动1
+    [Arguments]    ${str}    ${value}
+    等待时间    1
+    Comment    奖励活动1
+    Select From List By Value    xpath=//label[starts-with(text(),"${str}")]/following-sibling::span[1]/select    ${value}
+    等待时间    1
+    Comment    奖励活动1    数量
+    ${n}    随机数    10    100
+    Input Text    xpath=//label[starts-with(text(),"${str}")]/following-sibling::span[2]/input    ${n}
+    等待时间    1
+
+奖励活动2
+    [Arguments]    ${str}    ${n}    ${t}
+    Input Text    xpath=//label[starts-with(text(),"条件${n}")]/following-sibling::span/input    ${t}
+    : FOR    ${i}    IN RANGE    3
+    \    ${nn}    Evaluate    ${i}+1
+    \    ${option}    Evaluate    ${i}+1000
+    \    Select From List By Value    xpath=//label[starts-with(text(),"${str}")]/following-sibling::div[1]/div[${nn}]/span[1]/select    1000
+    \    等待时间    0.5
+    \    ${num}    随机数    10    100
+    \    Input Text    xpath=//label[starts-with(text(),"${str}")]/following-sibling::div[1]/div[${nn}]/span[2]/input    ${num}
+    \    等待时间    0.5
+
+查询-活动标识
+    [Arguments]    ${flag}
+    等待时间    3
+    Input Text    //input[@ng-model="searchParams.noticeId"]    ${flag}
+    等待时间    1
+    Click Element    //div[@class="inqu"]/button
+    等待时间    2
+    ${num}    Get Matching Xpath Count    //div[@class="tableList"]/div/table/tbody/tr
+    Run Keyword If    ${num}==1    log    success!
+    ...    ELSE    Fail    按标识查询错误
+
+查询-活动名称
+    [Arguments]    ${name}
+    等待时间    3
+    Input Text    //input[@ng-model="searchParams.noticeName"]    ${name}
+    等待时间    1
+    Click Element    //div[@class="inqu"]/button
+    等待时间    2
+    ${num}    Get Matching Xpath Count    //div[@class="tableList"]/div/table/tbody/tr
+    Run Keyword If    ${num}==1    log    success!
+    ...    ELSE    Fail    按标识查询错误

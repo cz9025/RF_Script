@@ -1,0 +1,129 @@
+*** Settings ***
+Documentation     礼物广播数最好不要超过十个，不然修改礼物广播可能会有问题
+...
+...               删除不能独立运行
+Suite Setup       登录
+Suite Teardown    关闭浏览器
+Test Teardown
+Library           Selenium2Library
+Resource          ../Resources/常用操作.txt
+Resource          ../Resources/系统配置.txt
+Resource          ../Resources/BaseData.txt
+
+*** Test Cases ***
+添加礼物广播
+    Comment    点击礼物管理
+    等待时间    3
+    Click Element    xpath=//span[text()="礼物管理"]
+    等待时间    1
+    Comment    点击礼物配置
+    Click Element    xpath=//p[text()="礼物广播"]
+    等待时间    3
+    Comment    添加礼物
+    Click Element    xpath=//div[text()="添加礼物广播"]
+    等待时间    3
+    Comment    选择礼物
+    Click Element    xpath=//select[@ng-model="addGiftBroadcast.giftId"]
+    等待时间    1
+    ${礼物数量}    Get Matching Xpath Count    xpath=//select[@ng-model="addGiftBroadcast.giftId"]/option
+    ${rand}    随机数    2    ${礼物数量}
+    等待时间    1
+    #选择礼物
+    Click Element    xpath=//select[@ng-model="addGiftBroadcast.giftId"]/option[${rand}]
+    ${title}    Get Text    xpath=//select[@ng-model="addGiftBroadcast.giftId"]/option[${rand}]
+    Comment    房间单次送礼个数:
+    ${rand}    随机数    1    50
+    Input Text    xpath=//input[@ng-model="addGiftBroadcast.roomSingleNum"]    ${rand}
+    Comment    房间连续送礼个数:
+    ${rand}    随机数    1    50
+    Input Text    xpath=//input[@ng-model="addGiftBroadcast.roomAlwaysNum"]    ${rand}
+    Comment    全服单次送礼个数:
+    ${rand}    随机数    50    100
+    Input Text    xpath=//input[@ng-model="addGiftBroadcast.fullSingleNum"]    ${rand}
+    Comment    全服连续送礼个数:
+    ${rand}    随机数    50    100
+    Input Text    xpath=//input[@ng-model="addGiftBroadcast.fullAlwaysNum"]    ${rand}
+    等待时间    1
+    Click Button    id=saveRoom
+    等待时间    3
+    #校验
+    按礼物名称查询    ${title}
+    等待时间    2
+    ${n}    Get Matching Xpath Count    xpath=//div[@class="box-content"]/table/tbody/tr
+    Run Keyword If    ${n}>=1    log    Success!
+    ...    ELSE    Fail    查询数量错误，实际还有${n}个
+    等待时间    1
+
+修改礼物广播
+    Reload Page
+    Wait Until Page Contains Element    xpath=//span[text()="礼物管理"]
+    Comment    点击礼物管理
+    等待时间    3
+    Click Element    xpath=//span[text()="礼物管理"]
+    等待时间    1
+    Comment    点击礼物配置
+    Click Element    xpath=//p[text()="礼物广播"]
+    等待时间    3
+    #获得当前页面的数量
+    ${count}    Get Matching Xpath Count    xpath=//div[@class="box-content"]/table/tbody/tr
+    Run Keyword If    ${count}>10    Fail    当前礼物广播超过10条，先做处理
+    Comment    点击修改    修改最后一条
+    Click Element    xpath=//div[@class="box-content"]/table/tbody/tr[${count}]/td[last()]/a[1]
+    等待时间    3
+    Comment    选择礼物
+    #先点击选择框    在弹出的列表中随机选择一个
+    Click Element    xpath=//select[@ng-model="courseToEdit.giftId"]
+    等待时间    1
+    ${option}    Get Matching Xpath Count    xpath=//select[@ng-model="courseToEdit.giftId"]/option
+    等待时间    1
+    ${rand}    随机数    2    ${option}
+    #获得选中的礼物名称
+    ${title}    Get Text    xpath=//select[@ng-model="courseToEdit.giftId"]/option[${rand}]
+    Click Element    xpath=//select[@ng-model="courseToEdit.giftId"]/option[${rand}]
+    等待时间    1
+    Comment    房间单次送礼个数:
+    ${rand}    随机数    1    5
+    Input Text    xpath=//input[@ng-model="courseToEdit.roomSingleNum"]    ${rand}
+    Comment    房间连续送礼个数:
+    ${rand}    随机数    1    5
+    Input Text    xpath=//input[@ng-model="courseToEdit.roomContinuNum"]    ${rand}
+    Comment    全服单次送礼个数:
+    ${rand}    随机数    5    10
+    Input Text    xpath=//input[@ng-model="courseToEdit.fullSingleNum"]    ${rand}
+    Comment    全服连续送礼个数:
+    ${rand}    随机数    5    10
+    Input Text    xpath=//input[@ng-model="courseToEdit.fullContinuNUm"]    ${rand}
+    等待时间    1
+    #保存
+    Click Button    xpath=//button[text()="保存" and @class="save"]
+    等待时间    3
+    #校验
+    按礼物名称查询    ${title}
+    ${n}    Get Matching Xpath Count    xpath=//div[@class="box-content"]/table/tbody/tr
+    Run Keyword If    ${n}>=1    log    Success!
+    ...    ELSE    Fail    查询数量错误，实际还有${n}个
+    等待时间    1
+
+删除礼物广播
+    ${count}    Get Matching Xpath Count    xpath=//div[@class="box-content"]/table/tbody/tr
+    Comment    点击删除    删除最后一条
+    Click Element    xpath=//div[@class="box-content"]/table/tbody/tr[${count}]/td[last()]/a[2]
+    等待时间    1
+    #确定删除
+    Click Element    xpath=//div[@class="delete"]/div[2]/button[2]
+    #校验    查询
+    等待时间    3
+    ${num}    Get Matching Xpath Count    xpath=//div[@class="box-content"]/table/tbody/tr
+    等待时间    1
+    ${count1}    Evaluate    ${count}-1
+    Run Keyword If    ${num}==${count1}    log    Success!
+    ...    ELSE    Fail    查询数量错误${num}
+    ############
+
+*** Keywords ***
+按礼物名称查询
+    [Arguments]    ${title}
+    Input Text    xpath=//input[@ng-model="reportData.nickname"]    ${title}
+    等待时间    1
+    Click Button    xpath=//button[@ng-show="btn.query"]
+    等待时间    3

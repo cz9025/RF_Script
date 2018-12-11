@@ -1,0 +1,19 @@
+*** Settings ***
+Library           ExcelLibrary
+
+*** Test Cases ***
+读取数据
+    Open Excel    E:\\A_RF脚本\\test.xls
+    #获取列
+    ${col}    Get Column Count    cz
+    #获取行
+    ${row}    Get Row Count    cz
+    log    ${row}
+    #行列序号从0开始
+    ${uri}    Read Cell Data By Coordinates    cz    1    0
+    log    ${uri}
+    #
+    :FOR    ${num}    IN RANGE    ${row}
+    \    ${value}    Get Row Values    cz    ${num}
+    \    log    mei::${value}
+    #可以用双层for遍历每一个数据

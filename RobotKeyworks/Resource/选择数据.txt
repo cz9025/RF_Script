@@ -1,0 +1,13 @@
+*** Settings ***
+Library           String
+
+*** Keywords ***
+随机数据
+    ${list}    Create List    湖南    广东    广西    广北    广南
+    ${len}    Get Length    ${list}
+    #可以取到头和尾
+    ${rand}    Evaluate    random.randint(0, ${len})    modules=random, sys
+    log    list:::${list[${rand}]}
+    #前面固定部分    后面还加字符以示区别
+    ${str}    Generate Random String    5
+    ${name}    Set Variable    【测试】${list[${rand}]}${str}

@@ -1,0 +1,78 @@
+*** Settings ***
+Library           Selenium2Library
+Library           String
+Library           Screenshot
+Library           ExcelLibrary
+
+*** Variables ***
+
+*** Keywords ***
+登录
+    [Documentation]    实现登录：
+    ...    \ \ \ 先打开页面，然后添加cookie，再刷新页面。
+    Run Keyword If    ${env} in [0,1,2]    log    start tests!!!
+    ...    ELSE    Fail    参数输入错误!!!
+    ${uri}    选择环境    ${env}
+    Open Browser    ${uri}    gc
+    Maximize Browser Window
+    Set Browser Implicit Wait    20
+    Set Selenium Timeout    20
+    Set Selenium Implicit Wait    20
+    Sleep    1
+    选择缓存    ${env}
+    Sleep    1
+    Reload Page
+    Sleep    3
+    Wait Until Page Contains Element    xpath=//a[text()="海妖后台"]
+
+关闭浏览器
+    Sleep    3
+    Close All Browsers
+
+失败重启
+    Run Keyword If Test Failed    Take Screenshot
+    Sleep    2
+    #如果用例执行失败    刷新页面也行啊
+    Run Keyword If Test Failed    登录
+    Sleep    3
+
+选择环境
+    [Arguments]    ${n}
+    Comment    Open Excel    ${CURDIR}\\test.xls
+    Open Excel    E:\\test.xls
+    #1行1列预发布
+    ${uri}    Read Cell Data By Coordinates    cz    0    ${n}
+    #2行1列重构
+    Comment    ${uri}    Read Cell Data By Coordinates    cz    0    1
+    #3行1列测试
+    Comment    ${uri}    Read Cell Data By Coordinates    cz    0    2
+    log    ${uri}
+    [Return]    ${uri}
+
+选择缓存
+    [Arguments]    ${n}
+    Run Keyword If    ${n}==0    预发布缓存
+    ...    ELSE IF    ${n}==1    重构缓存
+    ...    ELSE IF    ${n}==2    测试缓存
+    ...    ELSE    Fail    参数输入错误!!!
+
+预发布缓存
+    #预发布后台
+    Add Cookie    JSESSIONID    F830F61A49073B1B9DF727C622FDDC99
+    Add Cookie    userId    24295
+    Add Cookie    companyId    1
+    Add Cookie    token    d89cd439407547359149d0132b2c9910
+
+测试缓存
+    #测试环境后台
+    Add Cookie    JSESSIONID    874AE2B69994A961540220642A7A952A
+    Add Cookie    userId    31
+    Add Cookie    companyId    1
+    Add Cookie    token    79ceb9978a5e479eac6c9a28096c5f29
+
+重构缓存
+    #重构后台
+    Add Cookie    JSESSIONID    F060F1C41569E4DC80135B0A9EC6B0AC
+    Add Cookie    userId    1
+    Add Cookie    companyId    1
+    Add Cookie    token    9b5ebc46a52f483c995b641465c809b3

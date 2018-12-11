@@ -1,0 +1,466 @@
+*** Settings ***
+Suite Setup       登录
+Suite Teardown    关闭浏览器
+Test Teardown     失败重启
+Resource          ../Resource/常用操作.robot
+Resource          ../Resource/配置参数.robot
+Library           String
+Library           AutoItLibrary
+
+*** Test Cases ***
+图文素材_添加微信图文
+    点击菜单链接    微信设置
+    ${sub}    Set Variable    图文素材
+    点击菜单链接    ${sub}
+    Wait Until Page Contains Element    //*[@id="breadcrumbs"]/ul/li[contains(text(),"素材")]
+    Sleep    1
+    ####添加微信图文
+    Click Element    //*[@id="main-container"]/div/div[2]/div[2]/div/div/div[1]/div/div/div[1]/a[1]
+    Sleep    2
+    ####生成参数
+    ${标题}    随机字符    【微信图文】    12
+    ${是否在正文展示封面}    Generate Random String    1    01
+    ${摘要}    随机字符    【摘要】    60
+    ${作者}    随机字符    作者    8
+    ${作者rand}    Generate Random String    1    01
+    ${正文}    随机字符    【正文】    200
+    ${原文地址}    随机URL
+    ${原文Rand}    Generate Random String    1    1
+    ####输入参数
+    Input Text    //*[@id="main-container"]/div/div[2]/div[2]/div[1]/div/div[3]/div/div/form/div/div[1]/div/input    ${标题}
+    Sleep    1
+    #作者非必填，1为填写
+    Run Keyword If    ${作者rand}==1    Input Text    //*[@id="main-container"]//form//input[@ng-model="items[itemIndex].author"]    ${作者}
+    Sleep    1
+    微信图文封面    //a[text()="选择图片"]    //*[@id="insertImageMaterial"]/div/div/div[3]/a[2]
+    Sleep    1
+    Run Keyword If    ${是否在正文展示封面}==1    Click Element    //input[@ng-click="choosePicter($event)"]
+    Sleep    1
+    Input Text    //textarea[@placeholder="单条图文才显示摘要"]    ${摘要}
+    Sleep    1
+    ##正文
+    编辑器_输入
+    ##原文地址
+    Run Keyword If    ${原文Rand}==1    Input Text    //input[@type="url" and starts-with(@placeholder,"http://")]    ${原文地址}
+    Sleep    2
+    Mouse Out    //input[@type="url" and starts-with(@placeholder,"http://")]
+    Sleep    3
+    ####保存
+    Click Element    id=submit
+    Sleep    5
+    ####结果校验
+    弹框校验
+
+图文素材_修改微信图文
+    ####进入页面
+    点击菜单链接    微信设置
+    ${sub}    Set Variable    图文素材
+    点击菜单链接    ${sub}
+    Wait Until Page Contains Element    //*[@id="breadcrumbs"]/ul/li[contains(text(),"素材")]
+    Sleep    1
+    ####编辑微信图文
+    Click Element    //*[@id="js-wxtwInfo"]/li[@ng-repeat="list in tuWenList"]//span[@ng-bind="lista.title" and starts-with(text(),"【微信图文】")]/ancestor::li[1]//a[@title="编辑" and not(contains(@class,"ng-hide"))]
+    Sleep    2
+    ####生成参数
+    ${标题}    随机字符    【微信图文】改    12
+    ${是否在正文展示封面}    Generate Random String    1    01
+    ${摘要}    随机字符    【摘要】改    60
+    ${作者}    随机字符    作者    8
+    ${作者rand}    Generate Random String    1    01
+    ${正文}    随机字符    【正文】改    200
+    ${原文地址}    随机URL
+    ${原文Rand}    Generate Random String    1    01
+    ####输入参数
+    Input Text    //*[@id="main-container"]/div/div[2]/div[2]/div[1]/div/div[3]/div/div/form/div/div[1]/div/input    ${标题}
+    Sleep    1
+    微信图文封面    //a[text()="重新选择"]    //*[@id="insertImageMaterial"]/div/div/div[3]/a[2]
+    Sleep    1
+    Run Keyword If    ${是否在正文展示封面}==1    Click Element    //input[@ng-click="choosePictere($event)"]
+    Sleep    1
+    Input Text    //textarea[@placeholder="单条图文才显示摘要"]    ${摘要}
+    Sleep    3
+    编辑器_输入
+    等待时间
+    #鼠标移开原文地址
+    Mouse Out    //input[@type="url" and starts-with(@placeholder,"http://")]
+    Sleep    1
+    Run Keyword If    ${原文Rand}==1    Input Text    //input[@type="url" and starts-with(@placeholder,"http://")]    ${原文地址}
+    Sleep    3
+    Click Element    id=submit
+    Sleep    1
+    Sleep    3
+    ####结果校验
+    弹框校验
+
+图文素材_删除微信图文
+    ####进入页面
+    点击菜单链接    微信设置
+    ${sub}    Set Variable    图文素材
+    点击菜单链接    ${sub}
+    Wait Until Page Contains Element    //*[@id="breadcrumbs"]/ul/li[contains(text(),"素材")]
+    Sleep    1
+    ####删除微信图文
+    ${标题}    Get Text    //*[@id="js-wxtwInfo"]/li/div[4]/div/span[starts-with(text(),"【微信图文】")]/ancestor::li[1]/div[4]/div/span[2]
+    Click Element    //*[@id="js-wxtwInfo"]/li/div[4]/div/span[starts-with(text(),"【微信图文】")]/ancestor::li[1]/div[2]/div[2]/a[@title="删除" and not(contains(@class,'ng-hide'))]
+    Sleep    2
+    确定
+    弹框校验
+    Sleep    1.5
+    ####结果校验
+    Page Should Not Contain Element    //*[@id="js-wxtwInfo"]/li/div[4]/div/span[text()="${标题}"]
+    Log    Success!
+
+图文素材_添加安美弘图文
+    点击菜单链接    微信设置
+    ${sub}    Set Variable    图文素材
+    点击菜单链接    ${sub}
+    Wait Until Page Contains Element    //*[@id="breadcrumbs"]/ul/li[contains(text(),"素材")]
+    Sleep    1
+    ####添加龙蟠图文
+    Click Element    //*[@id="main-container"]/div[1]/div[2]/div[2]/div/div/div[1]/div/div/div[1]/a[2]/div
+    Sleep    2
+    ####生成参数
+    ${标题}    随机字符    【安美弘图文】    12
+    ${摘要}    随机字符    【摘要】    60
+    ####输入参数
+    Input Text    css=div.inner>div:nth-child(1)>div>input    ${标题}
+    Sleep    1
+    安美弘图文封面    //a[text()="选择图片"]    id=submitImage
+    Sleep    1
+    Input Text    //textarea[@placeholder="单条图文才显示摘要"]    ${摘要}
+    Sleep    1
+    ##图文外链类型
+    #选择营销模块
+    Select From List By Value    css=div.inner>div:nth-child(4)>select    2
+    Sleep    2
+    Sleep    3
+    Click Element    //*[@id="tabPane"]/div/div[2]/ul/li
+    ####确定
+    Click Element    //*[@id="activityModal"]/div/div/div[2]/div[2]/a[2]
+    Sleep    3
+    ###保存
+    Click Element    //*[@id="modal-footer"]/a
+    Sleep    10
+    ####结果校验
+    弹框校验
+
+图文素材_修改安美弘图文
+    ####进入页面
+    点击菜单链接    微信设置
+    ${sub}    Set Variable    图文素材
+    点击菜单链接    ${sub}
+    Wait Until Page Contains Element    //*[@id="breadcrumbs"]/ul/li[contains(text(),"素材")]
+    Sleep    1
+    ####编辑龙蟠图文
+    Click Element    //*[@id="js-wxtwInfo"]/li[@ng-repeat="list in tuWenList"]//span[@ng-bind="lista.title" and starts-with(text(),"【安美弘图文】")]/ancestor::li[1]//a[@title="编辑" and not(contains(@class,"ng-hide"))]
+    Sleep    2
+    ####生成参数
+    ${标题}    随机字符    【安美弘图文】改    12
+    ${摘要}    随机字符    【摘要】改    60
+    ####输入参数
+    Input Text    css=div.inner>div:nth-child(1)>div>input    ${标题}
+    Sleep    1
+    安美弘图文封面    //a[text()="重新选择"]    //*[@id="submitImage"]
+    Sleep    1
+    Sleep    1
+    Input Text    //textarea[@placeholder="单条图文才显示摘要"]    ${摘要}
+    Sleep    3
+    Sleep    3
+    Click Element    //*[@id="modal-footer"]/a
+    Sleep    1
+    Sleep    3
+    ####结果校验
+    弹框校验
+
+图文素材_删除安美弘图文
+    ####进入页面
+    点击菜单链接    微信设置
+    ${sub}    Set Variable    图文素材
+    点击菜单链接    ${sub}
+    Wait Until Page Contains Element    //*[@id="breadcrumbs"]/ul/li[contains(text(),"素材")]
+    Sleep    1
+    ####删除龙蟠图文
+    ${count}    Get Matching Xpath Count    //*[@id="js-wxtwInfo"]/li/div[4]/div/span[starts-with(text(),"【龙蟠图文】")]
+    Pass Execution If    ${count}==0    没有龙蟠图文无需删除
+    log    ${count}
+    ${标题}    Get Text    //*[@id="js-wxtwInfo"]/li/div[4]/div/span[starts-with(text(),"【龙蟠图文】")]
+    Click Element    //*[@id="js-wxtwInfo"]/li//span[@ng-bind="lista.title" and starts-with(text(),"【龙蟠图文】")]/ancestor::li//a[@title="删除"]
+    Sleep    2
+    确定
+    Sleep    3
+    ####结果校验
+    弹框校验
+    等待时间    10
+    Page Should Not Contain Element    //*[@id="js-wxtwInfo"]/li/div[4]/div/span[text()="${标题}"]
+    log    删除成功
+
+文本素材_添加
+    ####进入页面
+    点击菜单链接    微信设置
+    ${sub}    Set Variable    文本素材
+    点击菜单链接    ${sub}
+    Wait Until Page Contains Element    //*[@id="breadcrumbs"]/ul/li[contains(text(),"素材")]
+    Sleep    1
+    ####添加文本素材
+    Click Element    //div/a[text()='添加文本']
+    #等待添加文本消息的弹框出现
+    Wait Until Element Is Visible    id=myModalLabel1
+    ####生成参数
+    ${文本标签}    随机字符    【文本素材】    12
+    ${文本内容}    Generate Random String    1    01
+    ####输入参数
+    Input Text    //*[@id="newtextbox"]//input[@ng-model="groupObj.title" and @placeholder="请输入名字"]    ${文本标签}
+    Sleep    1
+    ##表情    Todo
+    Sleep    1
+    ##文字
+    编辑器_短文本
+    Sleep    2
+    Click Element    //*[@id="newtextbox"]//input[@ng-model="groupObj.title" and @placeholder="请输入名字"]
+    Sleep    2
+    Click Button    //*[@id="submit"]
+    Sleep    2
+    Wait Until Keyword Succeeds    10 sec    1 sec    弹框校验
+    Sleep    2
+    ####结果校验
+    Page Should Contain Element    //*[@id="main-container"]/div[1]/div[2]/div[2]/div/div/div[3]/div/div/table/tbody/tr/td/span[contains(text(),"${文本标签}")]
+
+文本素材_修改
+    ####进入页面
+    点击菜单链接    微信设置
+    ${sub}    Set Variable    文本素材
+    点击菜单链接    ${sub}
+    Wait Until Page Contains Element    //*[@id="breadcrumbs"]/ul/li[contains(text(),"素材")]
+    Sleep    1
+    ####修改文本素材
+    ${文本标签}    Get Text    //*[@id="main-container"]/div[1]/div[2]/div[2]/div/div/div[3]/div/div/table/tbody/tr/td/span[starts-with(text(),"【文本素材】")]
+    Click Element    //*[@id="main-container"]//tr[@class="ng-scope"]//span[contains(@class,"sc_title") and contains (text(),"文本素材")]/ancestor::tr[1]//a[@title="编辑"]
+    Sleep    2
+    ####生成参数
+    ${文本标签}    随机字符    【文本素材】    12
+    Sleep    2
+    ####输入参数
+    Input Text    //ng-form[@name="myformtwo"]//input[@placeholder="请输入名字"]    ${文本标签}
+    Sleep    1
+    ##表情    Todo
+    Sleep    1
+    ##文字
+    #编辑器_修改
+    Sleep    2
+    #Click Element    //*[@id="newtextbox"]//input[@ng-model="groupObj.title" and @placeholder="请输入名字"]
+    Sleep    2
+    Click Button    //*[@id="submit1"]
+    Sleep    2
+    Wait Until Keyword Succeeds    10 sec    1 sec    弹框校验
+    Sleep    2
+    ####结果校验
+    Page Should Contain Element    //*[@id="main-container"]/div[1]/div[2]/div[2]/div/div/div[3]/div/div/table/tbody/tr/td/span[contains(text(),"${文本标签}")]
+
+文本素材_删除
+    ####进入页面
+    点击菜单链接    微信设置
+    ${sub}    Set Variable    文本素材
+    点击菜单链接    ${sub}
+    Wait Until Page Contains Element    //*[@id="breadcrumbs"]/ul/li[contains(text(),"素材")]
+    Sleep    1
+    ####删除文本素材
+    ${文本标签}    Get Text    //*[@id="main-container"]/div[1]/div[2]/div[2]/div/div/div[3]/div/div/table/tbody/tr/td/span[starts-with(text(),"【文本素材】")]
+    Click Element    //*[@id="main-container"]//tr[@class="ng-scope"]//span[contains(@class,"sc_title") and contains (text(),"文本素材")]/ancestor::tr[1]//a[@title="删除"]
+    Sleep    2
+    确定
+    弹框校验
+    Sleep    1.5
+    ####结果校验
+    Page Should Not Contain Element    //*[@id="main-container"]/div[1]/div[2]/div[2]/div/div/div[3]/div/div/table/tbody/tr/td/span[starts-with(text(),"${文本标签}")]
+
+图片素材_添加
+    ####进入页面
+    点击菜单链接    微信设置
+    ${sub}    Set Variable    图片素材
+    点击菜单链接    ${sub}
+    Wait Until Page Contains Element    //*[@id="breadcrumbs"]/ul/li[contains(text(),"素材")]
+    Sleep    1
+    ####添加文本素材
+    Click Link    添加图片
+    Sleep    2
+    ####生成参数
+    ${标题}    随机字符    【图片素材】    12
+    ####输入参数
+    Input Text    //*[@id="main-container"]/div/div[2]/div[2]/div[1]/div/form/div[2]/div/div/div[1]/div/input    ${标题}
+    Sleep    1
+    #点击选择图片按钮
+    Click Element    id=chooseImage
+    Sleep    2
+    上传图片_政
+    #上传图片
+    Sleep    2
+    Wait Until Keyword Succeeds    30    3    弹框校验
+    Wait Until Page Contains Element    //*[@id="main-container"]/div/div[2]/div[2]/div[1]/div/form/div[2]/div/div/div[2]/div/div[2]/img
+    Wait Until Element Is Visible    //*[@id="main-container"]/div/div[2]/div[2]/div[1]/div/form/div[2]/div/div/div[2]/div/div[2]/img
+    Sleep    1
+    ####保存
+    Click Element    id=submit
+    Sleep    1.5
+    弹框校验
+    ####结果校验
+    Page Should Contain Element    //*[@id="main-container"]/div/div[2]/div[2]/div/div/div[2]/div/div[1]/ul/li[1]/h3[text()="${标题}"]
+
+图片素材_修改
+    ####进入页面
+    点击菜单链接    微信设置
+    ${sub}    Set Variable    图片素材
+    点击菜单链接    ${sub}
+    Wait Until Page Contains Element    //*[@id="breadcrumbs"]/ul/li[contains(text(),"素材")]
+    Sleep    1
+    ####修改图片素材
+    ${文本标签}    Get Text    //*[@id="main-container"]//div[@class="tabbable"]//li/h3[starts-with(text(),"【图片素材】")]/ancestor::li[1]/h3[starts-with(text(),"【图片素材】")]
+    Click Element    //*[@id="main-container"]//div[@class="tabbable"]//li/h3[starts-with(text(),"【图片素材】")]/ancestor::li[1]/div[3]/a[@title="编辑"]
+    Sleep    2
+    ####生成参数
+    ${文本标签}    随机字符    【图片素材】    12
+    Sleep    2
+    ####输入参数
+    Input Text    //*[@id="main-container"]/div/div[2]/div[2]/div/div[1]/form/div/div/div[2]/div[2]/div/div/div[1]/div/input    ${文本标签}
+    Sleep    2
+    #还要添加修改图片
+    Mouse Out    //*[@id="main-container"]/div/div[2]/div[2]/div/div[1]/form/div/div/div[2]/div[2]/div/div/div[1]/div/input
+    Sleep    2
+    Click Element    //a[@id="submit"]
+    Sleep    2
+    Wait Until Keyword Succeeds    10 sec    1 sec    弹框校验
+
+图片素材_删除
+    ####进入页面
+    点击菜单链接    微信设置
+    ${sub}    Set Variable    图片素材
+    点击菜单链接    ${sub}
+    Wait Until Page Contains Element    //*[@id="breadcrumbs"]/ul/li[contains(text(),"素材")]
+    Sleep    1
+    ####修改图片素材
+    ${文本标签}    Get Text    //*[@id="main-container"]//div[@class="tabbable"]//li/h3[starts-with(text(),"【图片素材】")]/ancestor::li[1]/h3[starts-with(text(),"【图片素材】")]
+    Click Element    //*[@id="main-container"]//div[@class="tabbable"]//li/h3[starts-with(text(),"【图片素材】")]/ancestor::li[1]/div[3]/a[@title="删除"]
+    Sleep    2
+    Sleep    2
+    确定
+    Sleep    2
+    Wait Until Keyword Succeeds    10 sec    1 sec    弹框校验
+    Page Should Not Contain Element    //*[@id="main-container"]/div[1]/div[2]/div[2]/div/div/div[2]/div/div[1]/ul//h3[starts-with(text(),"${文本标签}")]
+
+*** Keywords ***
+微信图文封面
+    [Arguments]    ${选择按钮}    ${确定按钮}
+    ####选择图文封面
+    Click Element    ${选择按钮}
+    Sleep    3
+    ${els}    Get Webelements    //*[@id="mytabPane"]/div[2]/ul/li
+    ${len}    Get Length    ${els}
+    ${图片}    Evaluate    random.randint(1,${len})    random
+    Sleep    2
+    Click Element    //*[@id="mytabPane"]/div[2]/ul/li[${图片}]
+    Sleep    2
+    Click Element    ${确定按钮}
+
+安美弘图文封面
+    [Arguments]    ${选择按钮}    ${确定按钮}
+    ####选择图文封面
+    Click Element    ${选择按钮}
+    Sleep    3
+    ${els}    Get Webelements    css=#select_ajax_form>div:nth-child(3)>div>ul>li
+    ${len}    Get Length    ${els}
+    ${图片}    Evaluate    random.randint(1,${len})    random
+    Sleep    2
+    Click Element    css=#select_ajax_form>div:nth-child(3)>div>ul>li:nth-child(${图片})>a
+    Sleep    2
+    Click Element    ${确定按钮}
+
+随机url
+    ${后缀}    Create List    com    net    cn    com.cn
+    ${后缀Rand}    Generate Random String    1    0123
+    ${域名}    Generate Random String    8    [LOWER]
+    ${URL}    Set Variable    http://www.${域名}.${后缀[${后缀Rand}]}
+    [Return]    ${URL}
+
+编辑器_输入
+    [Arguments]    ${iframeID}=ueditor_0
+    Wait Until Element Is Visible    id=${iframeID}
+    Select Frame    id=${iframeID}
+    ####输入内容
+    ${文本}    随机字符    【测试文本】    200
+    ${text}    Get Text    //html/body/p
+    Execute Javascript    var el=document.getElementsByTagName("p")[0];el.innerHTML = "${文本}";
+    Sleep    2
+    Click Element    //html/body/p
+    Sleep    1
+    Mouse Out    //html/body/p
+    Sleep    2
+    Unselect Frame
+    Sleep    3
+
+编辑器_短文本
+    [Arguments]    ${iframeID}=ueditor_0
+    Wait Until Element Is Visible    id=${iframeID}
+    Select Frame    id=${iframeID}
+    ####输入内容
+    ${文本}    随机字符    \    20
+    #${text}    Get Text    //html/body/p
+    Execute Javascript    var el=document.getElementsByTagName("p")[0];el.innerHTML = "${文本}";
+    Sleep    1
+    Press Key    //html/body    \\13
+    Sleep    3
+    Unselect Frame
+    Sleep    3
+
+编辑器_修改
+    [Arguments]    ${iframeID}=ueditor_1
+    Wait Until Element Is Visible    id=${iframeID}
+    Select Frame    id=${iframeID}
+    ####输入内容
+    ${文本}    随机字符    \    20
+    #${text}    Get Text    //html/body/p
+    Execute Javascript    var el=document.getElementsByTagName("p")[0];el.innerHTML = "${文本}";
+    Sleep    1
+    Press Key    //html/body    \\13
+    Sleep    3
+    Unselect Frame
+    Sleep    3
+
+上传图片
+    ####图片上传
+    ####生成参数
+    @{图片}    Create List    p1.jpg    p2.jpg    p3.jpg    p4.jpg    p5.jpg
+    ...    p6.jpg    p7.jpg
+    ${随机图片}    Generate Random String    1    0123456
+    ####输入参数
+    Sleep    2
+    Sleep    1
+    ${x}    Control Get Pos X    打开    \    [CLASS:ToolbarWindow32; INSTANCE:2]
+    ${y}    Control Get Pos Y    打开    \    [CLASS:ToolbarWindow32; INSTANCE:2]
+    ${width}    Control Get Pos Width    打开    \    [CLASS:ToolbarWindow32; INSTANCE:2]
+    ${heigth}    Control Get Pos Height    打开    \    [CLASS:ToolbarWindow32; INSTANCE:2]
+    ${xx}    Evaluate    ${width}-20
+    ${yy}    Evaluate    ${y}-10
+    Sleep    1
+    Control Click    打开    \    [CLASS:ToolbarWindow32; INSTANCE:2]    \    2    ${xx}
+    ...    ${yy}
+    Sleep    1
+    Send    d:\\pic
+    Sleep    1
+    Control Click    打开    ${EMPTY}    [CLASS:ToolbarWindow32; INSTANCE:3]    LEFT
+    Sleep    20
+    Control Send    打开    ${EMPTY}    [CLASS:Edit; INSTANCE:1]    ${图片[${随机图片}]}
+    Sleep    1
+    Control Click    打开    ${EMPTY}    [CLASS:Button; INSTANCE:1]    LEFT
+    Sleep    1
+
+上传图片_政
+    ####图片上传
+    ####生成参数
+    @{图片}    Create List    p1.jpg    p2.jpg    p3.jpg    p4.jpg    p5.jpg
+    ...    p6.jpg    p7.jpg
+    ${随机图片}    Generate Random String    1    0123456
+    ####输入参数
+    Sleep    2
+    Control Send    打开    ${EMPTY}    [CLASS:Edit; INSTANCE:1]    d:\\pic\\${图片[${随机图片}]}
+    Sleep    1
+    Control Click    打开    ${EMPTY}    [CLASS:Button; INSTANCE:1]    LEFT
+    Sleep    1

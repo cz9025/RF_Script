@@ -1,0 +1,133 @@
+*** Settings ***
+Suite Setup       登录
+Suite Teardown    关闭浏览器
+Test Teardown
+Library           Selenium2Library
+Resource          ../Resources/常用操作.txt
+Resource          ../Resources/系统配置.txt
+Resource          ../Resources/BaseData.txt
+
+*** Test Cases ***
+添加角色
+    Wait Until Page Contains Element    xpath=//span[text()="系统管理"]
+    Click Element    xpath=//span[text()="系统管理"]
+    等待时间    1
+    Click Element    xpath=//p[text()="权限管理"]
+    Wait Until Page Contains Element    xpath=//div[text()="添加角色"]
+    Click Element    xpath=//div[text()="添加角色"]
+    等待时间    1
+    #名称
+    ${角色}    随机字符    【角色】    8
+    Input Text    xpath=//div[@class="edit_course"]//label[text()="角色名称:"]/following-sibling::input    ${角色}
+    等待时间    1
+    #备注
+    Input Text    xpath=//div[@class="edit_course"]//label[text()="角色备注:"]/following-sibling::input    ${角色}
+    等待时间    1
+    #保存
+    Click Element    xpath=//div[@class="edit_course"]//input[@type="submit"]
+
+查询-角色名称
+    Reload Page
+    Wait Until Page Contains Element    xpath=//span[text()="系统管理"]
+    Click Element    xpath=//span[text()="系统管理"]
+    等待时间    1
+    Click Element    xpath=//p[text()="权限管理"]
+    Wait Until Page Contains Element    xpath=//div[@class="tab-content"]//div[@class="tableList"]//table/tbody//td[starts-with(text(),"【角色】")]
+    ${角色名称}    Get Text    //div[@class="box-content"]/table/tbody/tr/td[starts-with(text(),"【角色】")]
+    角色名称查询    ${角色名称}
+
+查询-角色类型
+    Reload Page
+    Wait Until Page Contains Element    xpath=//span[text()="系统管理"]
+    Click Element    xpath=//span[text()="系统管理"]
+    等待时间    1
+    Click Element    xpath=//p[text()="权限管理"]
+    Wait Until Page Contains Element    css=div.tab-content div.term div.fr label:nth-child(2)>select
+    #管理员查询
+    角色类型查询    0
+    #主播查询
+    Comment    角色类型查询    1
+    #普通用户查询
+    角色类型查询    2
+
+修改角色
+    #修改角色    只修改自己添加的
+    Reload Page
+    Wait Until Page Contains Element    xpath=//span[text()="系统管理"]
+    Click Element    xpath=//span[text()="系统管理"]
+    等待时间    1
+    Click Element    xpath=//p[text()="权限管理"]
+    Wait Until Page Contains Element    //div[@class="box-content"]/table/tbody/tr/td[starts-with(text(),"【角色】") or starts-with(text(),"【修改】")]    10    没有找到自己添加的角色名
+    ${角色名称}    Get Text    //div[@class="box-content"]/table/tbody/tr/td[starts-with(text(),"【角色】") or starts-with(text(),"【修改】")]
+    #点击修改
+    Click Element    //div[@class="box-content"]/table/tbody/tr/td[starts-with(text(),"【角色】") or starts-with(text(),"【修改】")]/../td[last()]/a[1]
+    等待时间    2
+    ${角色}    随机字符    【修改】    8
+    Input Text    xpath=//div[@class="edit_course"]//label[text()="角色名称:"]/following-sibling::input    ${角色}
+    #保存
+    Click Element    xpath=//div[@class="edit_course"]//button[@class="save"]
+    等待时间    2
+    #按角色名查询
+    Input Text    //div[@class="tab-content"]//div[@class="term"]//label[starts-with(text(),"角色名称:")]/input    ${角色}
+    等待时间    1
+    Click Button    //div[@class="tab-content"]//div[@class="term"]//div[@class="fr"]/div[2]/button
+    等待时间    2
+    #校验
+    ${n}    Get Matching Xpath Count    xpath=//div[@class="box-content"]/table/tbody/tr
+    Run Keyword If    ${n}==1    log    success!
+    ...    ELSE    Fail    修改角色名称${角色名称}==${角色}失败
+    等待时间    1
+
+删除角色
+    #删除角色    只删除自己添加的
+    Reload Page
+    Wait Until Page Contains Element    xpath=//span[text()="系统管理"]
+    Click Element    xpath=//span[text()="系统管理"]
+    等待时间    1
+    Click Element    xpath=//p[text()="权限管理"]
+    Wait Until Page Contains Element    //div[@class="box-content"]/table/tbody/tr/td[starts-with(text(),"【角色】") or starts-with(text(),"【修改】")]    10    没有找到自己添加的角色名
+    ${角色名称}    Get Text    //div[@class="box-content"]/table/tbody/tr/td[starts-with(text(),"【角色】") or starts-with(text(),"【修改】")]
+    #点击删除
+    Click Element    //div[@class="box-content"]/table/tbody/tr/td[starts-with(text(),"【角色】") or starts-with(text(),"【修改】")]/../td[last()]/a[2]
+    等待时间    2
+    #确定删除
+    Click Element    xpath=//div[@class="delete"]/div[2]/button[2]
+    等待时间    2
+    #查询该角色
+    Input Text    //div[@class="tab-content"]//div[@class="term"]//label[starts-with(text(),"角色名称:")]/input    ${角色名称}
+    Click Button    //div[@class="tab-content"]//div[@class="term"]//div[@class="fr"]/div[2]/button
+    等待时间    2
+    ${n}    Get Matching Xpath Count    xpath=//div[@class="box-content"]/table/tbody/tr
+    Run Keyword If    ${n}==0    log    success!
+    ...    ELSE    Fail    删除=${角色名称}=角色后还有相同角色
+    等待时间    1
+
+*** Keywords ***
+角色类型查询
+    [Arguments]    ${n}
+    Select From List By Value    css=div.tab-content div.term div.fr label:nth-child(2)>select    ${n}    #管理员
+    等待时间    1
+    ${类型}    Get Text    css=div.tab-content div.term div.fr label:nth-child(2)>select>option[value="${n}"]
+    等待时间    1
+    Click Button    //div[@class="tab-content"]//div[@class="term"]//div[@class="fr"]/div[2]/button
+    等待时间    2
+    ${count}    Get Matching Xpath Count    xpath=//div[@class="box-content"]/table/tbody/tr
+    : FOR    ${i}    IN RANGE    ${count}
+    \    ${i}    Evaluate    ${i}+1
+    \    ${角色名}    Get Text    //div[@class="box-content"]/table/tbody/tr[${i}]/td[3]
+    \    Run Keyword If    "${类型}"=="${角色名}"    log    success!
+    \    ...    ELSE    Fail    查询失败，"${角色名称}"<>"${角色名}"
+    等待时间    3
+
+角色名称查询
+    [Arguments]    ${角色名称}
+    Input Text    //div[@class="tab-content"]//div[@class="term"]//label[starts-with(text(),"角色名称:")]/input    ${角色名称}
+    等待时间    1
+    Click Button    //div[@class="tab-content"]//div[@class="term"]//div[@class="fr"]/div[2]/button
+    等待时间    2
+    ${n}    Get Matching Xpath Count    xpath=//div[@class="box-content"]/table/tbody/tr
+    : FOR    ${i}    IN RANGE    ${n}
+    \    ${i}    Evaluate    ${i}+1
+    \    ${角色名}    Get Text    //div[@class="box-content"]/table/tbody/tr[${i}]/td[starts-with(text(),"【角色】")]
+    \    Run Keyword If    "${角色名称}"=="${角色名}"    log    success!
+    \    ...    ELSE    Fail    查询失败，"${角色名称}"<>"${角色名}"

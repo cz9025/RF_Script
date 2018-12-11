@@ -1,0 +1,86 @@
+*** Settings ***
+Resource          Resources/常用操作.txt
+Library           ExcelLibrary
+Library           Collections
+Resource          Resources/BaseData.txt
+
+*** Test Cases ***
+登陆
+    Comment    登录
+    Open Browser    http://www.baidu.com    gc
+    Maximize Browser Window
+    Input Text    kw    123
+    #元素是否存在
+    ${boolen}    Is Element Present    kws
+    log    ${boolen}
+    Click Element    su
+    Sleep    3
+    Close All Browsers
+
+time
+    ${time}    Get Time
+    log    ${time}
+    ${s}    Evaluate    int(1+100)
+    log    int(${s})
+
+for
+    #012
+    : FOR    ${i}    IN RANGE    3
+    \    LOG    ${i}
+    Comment    1234567890
+    ${size}    Evaluate    5
+    #1234
+    : FOR    ${i}    IN RANGE    1    ${size}
+    \    LOG    ${i}
+    #循环变量
+    : FOR    ${i}    IN    1    2    3    4
+    \    log    ${i}
+    #    起始值    最大值    增量
+    : FOR    ${i}    IN RANGE    1    10    2
+    \    log    ${i}
+
+if
+    ${var}    Set Variable    1234
+    Run Keyword If    ${var}=="1234"    log    1
+    ...    ELSE IF    ${var}==1234    log    2
+    ...    ELSE    log    3
+    Comment    数字变量
+    log    ${123}
+    ${num}    Set Variable    ${123}
+    log    ${num}
+    ${number}    Evaluate    random.randint(10, 99)    modules=random, sys
+    ${q}    Evaluate    ${number}*0.01
+    log    ${q}
+    ${主播分成值}    随机数    1    9
+    ${分成值}    Evaluate    ${主播分成值}*0.1
+    Run Keyword If    "${var}"=="1234" and "${var}"=="1234"    log    hh
+
+字典的
+    ${dd}    Create Dictionary    a=1    b=2    c=3
+    ${d}    Create Dictionary    a=1    b=2    c=3
+    @{dic}    Create Dictionary    a=1    b=2    c=3
+    : FOR    ${i}    IN    @{dic}
+    \    log    ${i}
+    log    ${d.a}
+    ${txt}    Get From Dictionary    ${dd}    a
+    log    ${txt}
+
+包含关系
+    ${a}    Set Variable    abcd
+    ${b}    Set Variable    b
+    ${boolen}    Should Match Regexp    【名称】SFDSDF    【名称】
+    Run Keyword If    "${boolen}"=="【名称】"    log    运行名称
+    ...    ELSE    log    运行修改
+    Run Keyword If    "${b}" in "${a}"    log    运行修改
+
+正则
+    ${str}    Set Variable    wewerwer4545rte43543
+    ${intg}    Evaluate    re.findall("\\d+",'${str}')    re
+    log    ${intg}
+
+转换decode
+    [Documentation]    http://i.tianqi.com/index.php?c=code&id=12&color=%23&bdc=%23&icon=1&num=5&site=12
+    ...    天气接口
+    ${str}    Set Variable    豆腐干豆腐干
+    ${strdecode}    Evaluate    '${str}'.decode('utf-8')
+    log    ${strdecode}

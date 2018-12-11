@@ -1,0 +1,6 @@
+*** Variables ***
+&{account}        a=Add    u=Update    # 账号
+&{nick}           a=【昵称】    u=【昵称改】    # 昵称
+&{name}           a=【名称】    u=【名称改】    # 名称
+&{desc}           a=【描述】    u=【描述改】    # 描述
+&{pwd}            a=123456    u=654321    # 密码

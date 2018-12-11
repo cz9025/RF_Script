@@ -1,0 +1,11 @@
+*** Settings ***
+Library           String
+
+*** Keywords ***
+随机字符
+    [Arguments]    ${name}    ${lens}=10
+    ${len}    Get Length    ${name}
+    ${need}    Evaluate    ${lens}-${len}
+    ${rand}    Generate Random String    ${need}
+    ${randstr}    Set Variable    ${name}${rand}
+    [Return]    ${randstr}

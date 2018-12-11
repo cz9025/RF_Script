@@ -1,0 +1,49 @@
+*** Settings ***
+Suite Setup       登录
+Suite Teardown    关闭浏览器
+Test Teardown
+Library           Selenium2Library
+Resource          ../Resources/常用操作.txt
+Resource          ../Resources/系统配置.txt
+
+*** Test Cases ***
+房间标识查询
+    Comment    点击房间管理
+    Wait Until Page Contains Element    xpath=//span[text()="房间管理"]
+    Click Element    xpath=//span[text()="房间管理"]
+    Wait Until Page Contains Element    xpath=//p[text()="在线房间列表"]
+    Click Element    xpath=//p[text()="在线房间列表"]
+    Comment    直接查询该房间
+    ${n}    Get Matching Xpath Count    xpath=//div[@class="box-content"]/table/tbody/tr
+    Run Keyword If    ${n}==0    Fail    没有在线房间!!!
+    ${rand}    随机数    1    ${n}
+    ${房间标识}    Get Text    //div[@class="box-content"]/table/tbody/tr[${rand}]/td[1]
+    Comment    输入房间标识
+    Input Text    //input[@ng-model="reportData.roomID"]    ${房间标识}
+    等待时间    1
+    Comment    点击查询
+    Click Element    xpath=//button[text()="查询"]
+    等待时间    2
+    结果校验    1
+    ${标识}    Get Text    //div[@class="box-content"]/table/tbody/tr[1]/td[1]
+    Run Keyword If    ${房间标识}==${标识}    log    success!!!
+    ...    ELSE    Fail    查询房间标识错误!!!
+
+游戏类型查询
+    Reload Page
+    Comment    点击房间管理
+    Wait Until Page Contains Element    xpath=//span[text()="房间管理"]
+    Click Element    xpath=//span[text()="房间管理"]
+    Wait Until Page Contains Element    xpath=//p[text()="在线房间列表"]
+    Click Element    xpath=//p[text()="在线房间列表"]
+    Comment    直接查询该房间
+    ${n}    Get Matching Xpath Count    xpath=//div[@class="box-content"]/table/tbody/tr
+    Run Keyword If    ${n}==0    Fail    没有在线房间!!!
+    等待时间    1
+    Comment    点击查询
+    Click Element    xpath=//button[text()="查询"]
+    等待时间    2
+    结果校验    1
+    ${标识}    Get Text    //div[@class="box-content"]/table/tbody/tr[${rand}]/td[1]
+    Run Keyword If    ${房间标识}==${标识}    log    success!!!
+    ...    ELSE    Fail    查询房间标识错误!!!

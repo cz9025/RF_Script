@@ -1,0 +1,361 @@
+*** Settings ***
+Suite Setup       登录
+Suite Teardown    关闭浏览器
+Test Teardown     失败重启
+Resource          ../Resource/常用操作.robot
+Resource          ../Resource/配置参数.robot
+
+*** Test Cases ***
+秒杀活动-添加
+    ####进入页面
+    点击菜单链接    微营销
+    Wait Until Page Contains Element    //*[@id="breadcrumbs"]/ul/li    #等待 ‘秒杀活动管理’ 显示
+    ${sub}    Set Variable    秒杀活动
+    点击菜单链接    ${sub}
+    Sleep    3
+    点击菜单链接    添加活动
+    Wait Until Page Contains Element    //*[@id="breadcrumbs"]/ul/li    #等待 ‘添加秒杀活动’ 显示
+    ##输入图文标题
+    ${标题}    随机字符    【秒杀活动】    12
+    Input Text    //*[@id="home"]/div[2]/form/div[1]/div/input    ${标题}
+    Sleep    1
+    ###摘要内容
+    ${内容}    Generate Random String    50
+    Input Text    //*[@id="form-field-8"]    ${内容}
+    Sleep    1
+    ##活动图片
+    Click Element    //*[@id="home"]/div[2]/form/div[3]/div/div/a/label/span
+    Wait Until Page Contains Element    //h4[text()="图片管理器"]
+    ${count}    Get Matching Xpath Count    //*[@id="select_ajax_form"]/div[3]/div/ul/li    #算出当前图片总数
+    ${rand}    Evaluate    random.randint(1, ${count})    modules=random
+    Sleep    2
+    Click Element    //*[@id="select_ajax_form"]/div[3]/div/ul/li[${rand}]/a/img
+    Sleep    2
+    #确定
+    Click Element    id=submitImage
+    Sleep    2
+    #下一步
+    Click Element    //*[@id="btnConfirm"]
+    Sleep    3
+    #活动名称
+    Input Text    //*[@id="rule"]/form/div[1]/div/input    ${标题}
+    #活动时间
+    ${start}    Get Time    \    NOW+1h
+    ${year}    Get Time    year    NOW
+    ${month}    Get Time    month    NOW
+    ${day}    Get Time    day    NOW+48h
+    ${end}    Set Variable    ${year}-${month}-${day} 10:10:10
+    log    ${end}
+    #开始时间
+    Input Text    //*[@id="start_time"]    ${start}
+    Sleep    2
+    #结束时间
+    Input Text    //*[@id="end_time"]    ${end}
+    #其他地方点击下，隐藏时间
+    Click Element    //*[@id="rule"]/form/div[3]/div/span
+    #运费策略
+    Select From List By Value    //*[@id="rule"]/form/div[5]/div/select    1
+    #参加活动商品
+    选择商品
+    Sleep    2
+    #保存并关闭
+    Click Element    //*[@id="post"]
+    Sleep    2
+    弹框校验
+    #开启状态
+    Wait Until Page Contains Element    //*[@id="breadcrumbs"]/ul/li    #等待 ‘秒杀活动管理’ 显示
+    Click Element    //*[@id="main-container"]/div[1]/div[2]/div[2]/div/div/div[3]/table/tbody/tr[1]/td[6]/label/input
+    Sleep    3
+    弹框校验    开启
+
+秒杀活动-编辑
+    ####进入页面
+    点击菜单链接    微营销
+    Wait Until Page Contains Element    //*[@id="breadcrumbs"]/ul/li    #等待 ‘秒杀活动管理’ 显示
+    ${sub}    Set Variable    秒杀活动
+    点击菜单链接    ${sub}
+    Sleep    3
+    #编辑
+    Click Element    //*[@id="main-container"]/div[1]/div[2]/div[2]/div/div/div[3]/table/tbody/tr/td[starts-with(text(),"【秒杀活动】")]/ancestor::tr[1]/td[last()]/div/a[@title="编辑"]
+    Sleep    3
+    #下一步
+    Click Element    //*[@id="btnConfirm"]
+    Sleep    3
+    #保存并关闭
+    Click Element    //*[@id="post"]
+    Sleep    3
+    ${txt}    Get Alert Message
+    ${msg1}    Set Variable    请先暂停活动再修改
+    Run Keyword If    '${txt}'=='${msg1}'    编辑-关闭秒杀活动
+    Sleep    3
+    #编辑    关闭活动后
+    ${title}    Get Text    //*[@id="main-container"]/div[1]/div[2]/div[2]/div/div/div[3]/table/tbody/tr/td[starts-with(text(),"【秒杀活动】")]/ancestor::tr[1]/td[last()]/div/a[@title="编辑"]
+    Click Element    //*[@id="main-container"]/div[1]/div[2]/div[2]/div/div/div[3]/table/tbody/tr/td[starts-with(text(),"【秒杀活动】")]/ancestor::tr[1]/td[last()]/div/a[@title="编辑"]
+    ##输入图文标题
+    ${标题}    随机字符    【秒杀活动】    12
+    Input Text    //*[@id="home"]/div[2]/form/div[1]/div/input    ${标题}
+    Sleep    1
+    ###摘要内容
+    ${内容}    Generate Random String    50
+    Input Text    //*[@id="form-field-8"]    ${内容}
+    Sleep    1
+    ##活动图片
+    Click Element    //*[@id="home"]/div[2]/form/div[3]/div/div/a/label/span
+    Wait Until Page Contains Element    //h4[text()="图片管理器"]
+    ${count}    Get Matching Xpath Count    //*[@id="select_ajax_form"]/div[3]/div/ul/li    #算出当前图片总数
+    ${rand}    Evaluate    random.randint(1, ${count})    modules=random
+    Sleep    2
+    Click Element    //*[@id="select_ajax_form"]/div[3]/div/ul/li[${rand}]/a/img
+    Sleep    2
+    #确定
+    Click Element    id=submitImage
+    Sleep    2
+    #下一步
+    Click Element    //*[@id="btnConfirm"]
+    Sleep    3
+    #活动名称
+    Input Text    //*[@id="rule"]/form/div[1]/div/input    ${标题}
+    #活动时间
+    ${start}    Get Time    \    NOW+1h
+    ${year}    Get Time    year    NOW
+    ${month}    Get Time    month    NOW
+    ${day}    Get Time    day    NOW+48h
+    ${end}    Set Variable    ${year}-${month}-${day} 10:10:10
+    log    ${end}
+    #开始时间
+    Input Text    //*[@id="start_time"]    ${start}
+    Sleep    2
+    #结束时间
+    Input Text    //*[@id="end_time"]    ${end}
+    #其他地方点击下，隐藏时间
+    Click Element    //*[@id="rule"]/form/div[3]/div/span
+    #运费策略
+    Select From List By Value    //*[@id="rule"]/form/div[5]/div/select    1
+    #参加活动商品
+    选择商品
+    Sleep    2
+    #保存并关闭
+    Click Element    //*[@id="post"]
+    Sleep    2
+    弹框校验
+    Sleep    2
+    Page Should Not Contain Element    //*[@id="main-container"]/div[1]/div[2]/div[2]/div/div/div[3]/table/tbody/tr/td[contains(text()="${title}")]
+    Sleep    2
+    Page Should Contain Element    //*[@id="main-container"]/div[1]/div[2]/div[2]/div/div/div[3]/table/tbody/tr/td[contains(text()="${标题}")]
+    #开启状态
+    Wait Until Page Contains Element    //*[@id="breadcrumbs"]/ul/li    #等待 ‘秒杀活动管理’ 显示
+    Click Element    //*[@id="main-container"]/div[1]/div[2]/div[2]/div/div/div[3]/table/tbody/tr[1]/td[6]/label/input
+    Sleep    3
+    弹框校验    开启
+
+秒杀活动-删除
+    ####进入页面
+    点击菜单链接    微营销
+    Wait Until Page Contains Element    //*[@id="breadcrumbs"]/ul/li    #等待 ‘秒杀活动管理’ 显示
+    ${sub}    Set Variable    秒杀活动
+    点击菜单链接    ${sub}
+    Wait Until Page Contains Element    //*[@id="breadcrumbs"]/ul/li    #等待 ‘秒杀活动管理’ 显示
+    ####删除
+    ${title}    Get Text    //*[@id="main-container"]/div[1]/div[2]/div[2]/div/div/div[3]/table/tbody/tr/td[starts-with(text(),"【秒杀活动】")]
+    Sleep    1
+    Click Element    //*[@id="main-container"]/div[1]/div[2]/div[2]/div/div/div[3]/table/tbody/tr/td[starts-with(text(),"【秒杀活动】")]/ancestor::tr[1]/td[last()]/div/a[@title="删除"]
+    Sleep    3
+    #确认删除提示
+    确定    删除
+    Sleep    3
+    ${txt}    Get Alert Message
+    ${msg}    Set Variable    进行中的活动不能删除
+    Run Keyword If    '${txt}'=='${msg}'    关闭秒杀活动
+    Sleep    3
+    Page Should Not Contain Element    //*[@id="main-container"]/div[1]/div[2]/div[2]/div/div/div[3]/table/tbody/tr/td[(text()=${title})]
+    Log    Success!
+
+拼团活动-添加
+    ####进入页面
+    点击菜单链接    微营销
+    Wait Until Page Contains Element    //*[@id="breadcrumbs"]/ul/li    #等待 ‘秒杀活动管理’ 显示
+    ${sub}    Set Variable    拼团活动
+    点击菜单链接    ${sub}
+    Sleep    3
+    点击菜单链接    添加活动
+    Wait Until Page Contains Element    //*[@id="breadcrumbs"]/ul/li    #等待 ‘添加秒杀活动’ 显示
+    ##输入图文标题
+    ${标题}    随机字符    【拼团活动】    12
+    Input Text    //*[@id="home"]/div[2]/form/div[1]/div/input    ${标题}
+    Sleep    1
+    ###摘要内容
+    ${内容}    Generate Random String    50
+    Input Text    //*[@id="form-field-8"]    ${内容}
+    Sleep    1
+    ##活动图片
+    Click Element    //*[@id="home"]/div[2]/form/div[3]/div/div/a/label/span
+    Wait Until Page Contains Element    //h4[text()="图片管理器"]
+    ${count}    Get Matching Xpath Count    //*[@id="select_ajax_form"]/div[3]/div/ul/li    #算出当前图片总数
+    ${rand}    Evaluate    random.randint(1, ${count})    modules=random
+    Sleep    2
+    Click Element    //*[@id="select_ajax_form"]/div[3]/div/ul/li[${rand}]/a/img
+    Sleep    2
+    #确定
+    Click Element    id=submitImage
+    Sleep    2
+    #下一步
+    Click Element    //*[@id="btnConfirm"]
+    Sleep    3
+    #开启条件
+    Click Element    //*[@id="rule"]/ng-form/div[1]/div[1]/label/input
+    Sleep    1
+    #活动名称
+    Input Text    //*[@id="rule"]/ng-form/div[2]/div/input    ${标题}
+    #活动时间
+    ${start}    Get Time    \    NOW+2min
+    ${year}    Get Time    year    NOW
+    ${month}    Get Time    month    NOW
+    ${day}    Get Time    day    NOW+48h
+    ${end}    Set Variable    ${year}-${month}-${day} 10:10:10
+    log    ${end}
+    #开始时间
+    Input Text    //*[@id="start_time"]    ${start}
+    Sleep    2
+    #结束时间
+    Input Text    //*[@id="end_time"]    ${end}
+    #其他地方点击下，隐藏时间
+    Click Element    //*[@id="rule"]/ng-form/div[4]/div/span
+    #运费策略
+    Select From List By Value    //*[@id="rule"]/ng-form/div[6]/div/select    1
+    #参加活动商品
+    选择商品-拼团
+    Sleep    2
+    #保存并关闭
+    Click Element    //*[@id="post"]
+    Sleep    2
+    弹框校验
+    #开启状态
+    Wait Until Page Contains Element    //*[@id="breadcrumbs"]/ul/li    #等待 ‘秒杀活动管理’ 显示
+    Click Element    //*[@id="main-container"]/div[1]/div[2]/div[2]/div/div/div[3]/table/tbody/tr[1]/td[6]/label/input
+    Sleep    3
+    弹框校验    开启
+
+满减包邮-添加
+    ####进入页面
+    点击菜单链接    微营销
+    Wait Until Page Contains Element    //*[@id="breadcrumbs"]/ul/li    #等待 ‘秒杀活动管理’ 显示
+    ${sub}    Set Variable    满减包邮
+    点击菜单链接    ${sub}
+    Sleep    3
+    点击菜单链接    添加活动
+    Wait Until Page Contains Element    //*[@id="breadcrumbs"]/ul/li    #等待 ‘添加满减包邮活动’ 显示
+    ##输入图文标题
+    ${标题}    随机字符    【满减包邮】    12
+    Input Text    //*[@id="main-container"]/div[1]/div[2]/div[2]/div[2]/div/form/div[1]/div/input    ${标题}
+    Sleep    1
+    #活动时间
+    ${start}    Get Time
+    ${year}    Get Time    year    NOW
+    ${month}    Get Time    month    NOW
+    ${day}    Get Time    day    NOW+48h
+    ${end}    Set Variable    ${year}-${month}-${day} 10:10:10
+    log    ${end}
+    #开始时间
+    Input Text    //*[@id="start_time"]    ${start}
+    Sleep    2
+    #结束时间
+    Input Text    //*[@id="end_time"]    ${end}
+    #其他地方点击下，隐藏时间
+    Click Element    //*[@id="main-container"]/div[1]/div[2]/div[2]/div[2]/div/form/div[1]/div/input
+    #满x元
+    Input Text    //*[@id="area"]/tbody/tr[2]/td[1]/div[1]/div/div/input    10
+    Sleep    2
+    #dazhe
+    Click Element    //*[@id="area"]/tbody/tr[2]/td[2]/div[2]/label/input
+    Sleep    2
+    Input Text    //*[@id="area"]/tbody/tr[2]/td[2]/div[2]/div/div/input    1
+    Sleep    2
+    #保存并关闭
+    Click Element    //*[@id="post"]
+    Sleep    2
+    弹框校验
+    #开启状态
+    Wait Until Page Contains Element    //*[@id="breadcrumbs"]/ul/li    #等待 ‘满减包邮’ 显示
+    Click Element    //*[@id="main-container"]/div/div[2]/div[2]/div/div/div[3]/table/tbody/tr[1]/td[6]/label/input
+    Sleep    3
+    弹框校验    开启
+
+秒杀活动-添
+    ####进入页面
+    点击菜单链接    微营销
+    Wait Until Page Contains Element    //*[@id="breadcrumbs"]/ul/li    #等待 ‘秒杀活动管理’ 显示
+    ${sub}    Set Variable    秒杀活动
+    点击菜单链接    ${sub}
+    Sleep    3
+    checkbox_should_be_selected    //*[@id="main-container"]/div[1]/div[2]/div[2]/div/div/div[3]/table/tbody/tr/td[starts-with(text(),"【秒杀活动】")]/ancestor::tr[1]/td[6]/label/input
+
+*** Keywords ***
+关闭秒杀活动
+    log    准备关闭已开启的秒杀活动
+    #能进入这里，说明要删除的第一个是开启的
+    Click Element    //*[@id="main-container"]/div[1]/div[2]/div[2]/div/div/div[3]/table/tbody/tr/td[starts-with(text(),"【秒杀活动】")]/ancestor::tr[1]/td[6]/label/input
+    Sleep    5
+    弹框校验    活动已关闭
+    Sleep    5
+    ####删除
+    Click Element    //*[@id="main-container"]/div[1]/div[2]/div[2]/div/div/div[3]/table/tbody/tr/td[starts-with(text(),"【秒杀活动】")]/ancestor::tr[1]/td[last()]/div/a[@title="删除"]
+    Sleep    3
+    #确认删除提示
+    确定    删除
+    Sleep    3
+    弹框校验
+
+选择商品-拼团
+    [Arguments]    ${goods}=//*[@id="rule"]/ng-form/div[9]/div/a
+    Click Element    ${goods}
+    Sleep    2
+    Click Element    //*[@id="product"]/div[1]/table/tbody[1]/tr[1]
+    Sleep    2
+    Click Element    //*[@id="product"]/div[1]/table/tbody[1]/tr[2]/td/table/tbody/tr[2]/td[1]/label/input
+    Sleep    2
+    #确定
+    Click Element    //*[@id="productModal"]/div/div/div[3]/a[2]
+    #设置商品
+    Input Text    //*[@id="tbody"]/tr/td[6]/input    0.01    #秒杀价
+    Sleep    1
+    Input Text    //*[@id="tbody"]/tr/td[8]/input    10    #配额
+    Sleep    1
+    Input Text    //*[@id="tbody"]/tr/td[9]/input    2    #参团人数要求
+    Sleep    1
+    Input Text    //*[@id="tbody"]/tr/td[10]/input    2    #限购
+    Sleep    1
+    Click Element    //*[@id="tbody"]/tr/td[11]/div/a[1]/i    #保存
+    Sleep    2
+    弹框校验
+
+选择商品
+    [Arguments]    ${goods}=//*[@id="rule"]/form/div[8]/div/a
+    Click Element    ${goods}
+    Sleep    2
+    Click Element    //*[@id="product"]/div[1]/table/tbody[1]/tr[1]
+    Sleep    2
+    Click Element    //*[@id="product"]/div[1]/table/tbody[1]/tr[2]/td/table/tbody/tr[2]/td[1]/label/input
+    Sleep    2
+    #确定
+    Click Element    //*[@id="productModal"]/div/div/div[3]/a[2]
+    #设置商品    秒杀价    配额    限购
+    Input Text    //*[@id="tbody"]/tr/td[6]/input    0.01    #秒杀价
+    Sleep    1
+    Input Text    //*[@id="tbody"]/tr/td[8]/input    2    #配额
+    Sleep    1
+    Input Text    //*[@id="tbody"]/tr/td[9]/input    2    #限购
+    Sleep    1
+    Click Element    //*[@id="tbody"]/tr/td[10]/div/a[1]/i    #保存
+    Sleep    2
+    弹框校验
+
+编辑-关闭秒杀活动
+    log    准备关闭已开启的秒杀活动
+    ${sub}    Set Variable    秒杀活动
+    点击菜单链接    ${sub}
+    Sleep    5
+    #能进入这里，说明第一个是开启的
+    Click Element    //*[@id="main-container"]/div[1]/div[2]/div[2]/div/div/div[3]/table/tbody/tr/td[starts-with(text(),"【秒杀活动】")]/ancestor::tr[1]/td[6]/label/input
+    Sleep    5
+    弹框校验    活动已关闭
+    Sleep    5

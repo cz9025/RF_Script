@@ -1,0 +1,214 @@
+*** Settings ***
+Documentation     每次添加房间都通过房间标识查询下，判断唯一性
+Suite Setup       登录
+Suite Teardown    关闭浏览器
+Test Teardown
+Library           Selenium2Library
+Resource          ../Resources/常用操作.txt
+Resource          ../Resources/系统配置.txt
+
+*** Test Cases ***
+添加房间-空
+    Comment    点击房间管理
+    Wait Until Page Contains Element    xpath=//span[text()="房间管理"]
+    Click Element    xpath=//span[text()="房间管理"]
+    等待时间    1
+    Comment    点击房间列表
+    Click Element    xpath=//p[text()="房间列表"]
+    房间信息    1
+
+添加房间-快速场
+    Comment    先刷新页面    不然再次点击左侧列表会隐藏
+    Reload Page
+    Comment    点击房间管理
+    Wait Until Page Contains Element    xpath=//span[text()="房间管理"]
+    Click Element    xpath=//span[text()="房间管理"]
+    等待时间    1
+    Comment    点击房间列表
+    Click Element    xpath=//p[text()="房间列表"]
+    房间信息    2
+
+添加房间-快速体验房
+    Comment    先刷新页面    不然再次点击左侧列表会隐藏
+    Reload Page
+    Comment    点击房间管理
+    Wait Until Page Contains Element    xpath=//span[text()="房间管理"]
+    Click Element    xpath=//span[text()="房间管理"]
+    等待时间    1
+    Comment    点击房间列表
+    Click Element    xpath=//p[text()="房间列表"]
+    房间信息    3
+
+按主播查询
+    Comment    先刷新页面    不然再次点击左侧列表会隐藏
+    Reload Page
+    Comment    点击房间管理
+    Wait Until Page Contains Element    xpath=//span[text()="房间管理"]
+    Click Element    xpath=//span[text()="房间管理"]
+    等待时间    1
+    Comment    点击房间列表
+    Click Element    xpath=//p[text()="房间列表"]
+    Wait Until Page Contains Element    //div[@class="tab-content"]//div[@class="account"]/label[text()="主播: "]/input
+    #点击主播
+    Click Element    //div[@class="tab-content"]//div[@class="account"]/label[text()="主播: "]/input
+    Wait Until Page Contains Element    //div[@class="anchorModals"]//table/tbody/tr
+    等待时间    1
+    ${count}    Get Matching Xpath Count    //div[@class="anchorModals"]//table/tbody/tr
+    等待时间    1
+    ${主播}    Evaluate    ${count}-1
+    Run Keyword If    ${主播}==0    Fail    没有可选择的主播
+    ${rand}    随机数    2    ${count}
+    Click Element    //div[@class="anchorModals"]//table/tbody/tr[${rand}]/td[1]/input
+    等待时间    2
+    #提交
+    Click Element    id=anchorSub
+    等待时间    1
+    #查询
+    Click Element    xpath=//button[@ng-show="btn.query"]
+
+房间状态判断
+    Reload Page
+    Comment    点击房间管理
+    Wait Until Page Contains Element    xpath=//span[text()="房间管理"]
+    Click Element    xpath=//span[text()="房间管理"]
+    等待时间    1
+    Comment    点击房间列表
+    Click Element    xpath=//p[text()="房间列表"]
+    等待时间    2
+    房间状态
+    等待时间    2
+    #再次点击还原
+    房间状态
+
+删除空房间
+    Reload Page
+    Comment    点击房间管理
+    Wait Until Page Contains Element    xpath=//span[text()="房间管理"]
+    Click Element    xpath=//span[text()="房间管理"]
+    等待时间    1
+    Comment    点击房间列表
+    Click Element    xpath=//p[text()="房间列表"]
+    等待时间    2
+    #获得一个空房间
+    ${空房间标识}    Get Text    //div[@class="box-content"]/table/tbody/tr/td[text()="--"]/../td[3]
+    #判断空房间的状态
+    ${空房间状态}    Get Text    //div[@class="box-content"]/table/tbody/tr/td[text()="${空房间标识}"]/../td[8]
+    Run Keyword If    "${空房间状态}"=="禁用"    直接删除房间    ${空房间标识}
+    等待时间    1
+    #如果是启用状态    先禁用
+    Run Keyword If    "${空房间状态}"=="启用"    禁用并删除房间    ${空房间标识}
+    等待时间    1
+    #校验
+    房间标识查询    ${空房间标识}
+    结果校验    0
+
+*** Keywords ***
+房间信息
+    [Arguments]    ${n}
+    Wait Until Page Contains Element    xpath=//div[text()="添加房间"]
+    Comment    点击添加房间
+    Click Element    xpath=//div[text()="添加房间"]
+    等待时间    3
+    Comment    房间标识
+    ${room}    随机数    100    999999
+    Input Text    id=roomPump    ${room}
+    等待时间    1
+    Comment    玩法类型
+    Click Element    xpath=//form[@id="innerBoxRoom"]//label[text()="玩法类型:"]/following-sibling::select
+    等待时间    0.5
+    Click Element    xpath=//form[@id="innerBoxRoom"]//label[text()="玩法类型:"]/following-sibling::select/option[${n}]
+    等待时间    1
+    Comment    游戏类型
+    ${playMethod}    随机数    1    2
+    Click Element    id=playMethod
+    等待时间    0.5
+    ${count}    Get Matching Xpath Count    xpath=//select[@id="playMethod"]/option
+    Run Keyword If    ${count}==1    Click Element    xpath=//select[@id="playMethod"]/option[1]
+    ...    ELSE    设置1    ${count}
+    等待时间    1
+    Comment    房间类型
+    Click Element    xpath=//form[@id="innerBoxRoom"]//label[text()="房间类型:"]/following-sibling::select
+    等待时间    0.5
+    ${count}    Get Matching Xpath Count    xpath=//form[@id="innerBoxRoom"]//label[text()="房间类型:"]/following-sibling::select/option
+    Run Keyword If    ${count}==1    Click Element    xpath=//form[@id="innerBoxRoom"]//label[text()="房间类型:"]/following-sibling::select/option[1]
+    ...    ELSE    设置2    ${count}
+    Comment    房间人数限制
+    等待时间    1
+    ${roomtype}    随机数    1    3
+    ${peope}    Evaluate    ${roomtype}+${roomtype}*2    #这样值就是3 6 9
+    Click Element    //form[@id="innerBoxRoom"]//label[text()="房间人数限制:"]/following-sibling::select
+    等待时间    0.5
+    Click Element    //form[@id="innerBoxRoom"]//label[text()="房间人数限制:"]/following-sibling::select/option[${roomtype}]
+    等待时间    1
+    Comment    保存
+    Click Element    id=saveRoom
+    等待时间    2
+    Comment    提交
+    Click Element    id=BatchAdd
+    等待时间    3
+    房间标识查询    ${room}
+    #校验
+    结果校验    1
+    [Return]    ${room}
+
+设置1
+    [Arguments]    ${count}
+    ${i}    随机数    2    ${count}
+    Click Element    xpath=//select[@id="playMethod"]/option[${i}]
+
+设置2
+    [Arguments]    ${count}
+    ${i}    随机数    2    ${count}
+    Click Element    xpath=//form[@id="innerBoxRoom"]//label[text()="房间类型:"]/following-sibling::select/option[${i}]
+
+房间标识查询
+    [Arguments]    ${room}
+    Comment    直接查询该房间
+    Comment    输入房间标识
+    Input Text    //input[@ng-model="reportData.roomID"]    ${room}
+    等待时间    1
+    Comment    点击查询
+    Click Element    xpath=//button[@ng-show="btn.query"]
+    等待时间    2
+
+禁用-启用
+    [Arguments]    ${text}
+    #点击禁用    启用
+    Click Element    //div[@class="box-content"]/table/tbody/tr[1]/td[last()]/a[1]
+    等待时间    3
+    #开关
+    ${status2}    Get Text    //div[@class="box-content"]/table/tbody/tr[1]/td[last()]/a[1]
+    等待时间    1
+    #字段    文字
+    ${status1}    Get Text    //div[@class="box-content"]/table/tbody/tr[1]/td[8]
+    等待时间    1
+    Run Keyword If    "${status2}"=="${text}"    log    切换正确!!!
+    ...    ELSE    log    切换错误!!!
+    等待时间    1
+    Run Keyword If    "${status1}"!="${text}"    log    切换正确!!!
+    ...    ELSE    log    切换错误!!!
+
+房间状态
+    #判断第一个房间
+    #字段    文字
+    ${status1}    Get Text    //div[@class="box-content"]/table/tbody/tr[1]/td[8]
+    #开关
+    ${status2}    Get Text    //div[@class="box-content"]/table/tbody/tr[1]/td[last()]/a[1]
+    等待时间    1
+    Run Keyword If    "${status2}"!="${status1}"    log    状态值正确!
+    ...    ELSE    log    状态值不正确!
+    #点击禁用
+    Run Keyword If    "${status2}"=="禁用"    禁用-启用    启用
+    Run Keyword If    "${status2}"=="启用"    禁用-启用    禁用
+
+直接删除房间
+    [Arguments]    ${空房间标识}
+    Click Element    //div[@class="box-content"]/table/tbody/tr/td[text()="${空房间标识}"]/../td[last()]/a[3]
+    Sleep    2
+    确认删除
+
+禁用并删除房间
+    [Arguments]    ${空房间标识}
+    禁用-启用    启用
+    等待时间    2
+    直接删除房间    ${空房间标识}

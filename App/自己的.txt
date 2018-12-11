@@ -1,0 +1,80 @@
+*** Settings ***
+Suite Setup
+Suite Teardown    Close All Browsers
+Library           RequestsLibrary
+Library           Collections
+Library           Selenium2Library
+Library           String
+Library           json
+
+*** Test Cases ***
+shoppe
+    Open Browser    http://www.baidu.com    chrome
+    Set Selenium Timeout    40
+    Sleep    15
+    Maximize Browser Window
+    Sleep    15
+    #点登录
+    Input Text    kw    cz9025
+    Click Element    su
+
+循环电话
+    Repeat Keyword    1000    电话
+
+发布博客
+    [Setup]
+    登录博客
+    Repeat Keyword    200    发博客
+    [Teardown]
+
+*** Keywords ***
+电话
+    ${num}    Generate Random String    8    0123456789
+    ${tel}    Evaluate    138${num}
+    log    ${tel}
+    Comment    ${headers}    Create Dictionary    Content-Type=application/json; charset=UTF-8    Content-Encoding=Gzip
+    Create Session    uri    http://mobsec-dianhua.baidu.com
+    ${params}    Create Dictionary    tel=${tel}
+    ${test}    Get Request    uri    /dianhua_api/open/location?    params=${params}    #headers=${headers}
+    log    ${test.content}
+    Should Be Equal As Strings    ${test.status_code}    200
+
+电话归属地
+    ${num}    Generate Random String    8    0123456789
+    ${tel}    Evaluate    138${num}
+    log    ${tel}
+    Comment    ${headers}    Create Dictionary    Content-Type=application/json; charset=UTF-8    Content-Encoding=Gzip
+    Create Session    uri    http://i.ataohao.com
+    ${params}    Create Dictionary    cmd=80100031    param=<number>${tel}</number><type>1<type>
+    ${test}    Get Request    uri    /api/hw?    params=${params}    #headers=${headers}
+    log    ${test.content}
+    Should Be Equal As Strings    ${test.status_code}    200
+
+登录博客
+    Open Browser    http://127.0.0.1:8000/blog/    chrome
+    Set Selenium Timeout    40
+    Maximize Browser Window
+    Wait Until Page Contains Element    id=login
+    #点登录
+    Click Element    id=login
+    Sleep    2
+    Input Text    id_username    cz
+    Input Text    id=id_password    123456
+    Click Button    id=sub
+    Sleep    2
+    Click Element    id=myblog
+    Sleep    1
+
+发博客
+    #点击我的博客
+    Click Element    id=addblog
+    Sleep    1
+    #标题
+    ${str}    Generate Random String    20
+    Input Text    id=title    ${str}
+    #内容
+    ${con}    Generate Random String    150
+    Input Text    id=content    ${con}
+    #发布
+    Click Button    id=fabu
+    Wait Until Page Contains Element    id=addblog

@@ -1,0 +1,252 @@
+*** Settings ***
+Suite Setup       登录
+Suite Teardown    关闭浏览器
+Test Teardown     失败重启
+Resource          ../Resource/常用操作.robot
+Resource          ../Resource/配置参数.robot
+Library           String
+Library           Selenium2Library
+
+*** Test Cases ***
+用户消息-查看
+    ####进入页面
+    点击菜单链接    微信设置
+    Wait Until Page Contains Element    //*[@id="navList"]/li[2]/a/span
+    ##点击消息管理    展开
+    Click Element    //*[@id="navList"]/li[4]/a/span
+    Sleep    1
+    ${sub}    Set Variable    用户消息
+    点击菜单链接    ${sub}
+    Sleep    3
+    ####查看消息
+    #随机查看一条消息    对比消息中的字段是否正确
+    ${lens}    Get Matching Xpath Count    //*[@id="main-container"]/div[1]/div[2]/div[2]/div/div/div[4]/div/div[1]/div/table/tbody/tr
+    Pass Execution If    ${lens}==0    没有用户消息，pass
+    ####目前对比的是第一条消息    有同一个用户可能发送多条消息的情况
+    ${随机}    Evaluate    random.randint(1, 1)    modules=random
+    ${user}    Get Text    //*[@id="main-container"]/div[1]/div[2]/div[2]/div/div/div[4]/div/div[1]/div/table/tbody/tr[${随机}]/td[1]
+    ${contesxt}    Get Text    //*[@id="main-container"]/div[1]/div[2]/div[2]/div/div/div[4]/div/div[1]/div/table/tbody/tr[${随机}]/td[2]
+    ${time}    Get Text    //*[@id="main-container"]/div[1]/div[2]/div[2]/div/div/div[4]/div/div[1]/div/table/tbody/tr[${随机}]/td[3]
+    ${status}    Get Text    //*[@id="main-container"]/div[1]/div[2]/div[2]/div/div/div[4]/div/div[1]/div/table/tbody/tr[${随机}]/td[4]/span
+    Sleep    2
+    Click Element    //*[@id="main-container"]/div[1]/div[2]/div[2]/div/div/div[4]/div/div[1]/div/table/tbody/tr[${随机}]/td[last()]/div/a[last()]
+    Wait Until Page Contains Element    //h4[text()="消息" and @class="modal-title"]
+    ${发送人}    Get Text    //*[@id="message"]/div/div/form/div[2]/div/div/table/tbody/tr/td[1]
+    ${消息内容}    Get Text    //*[@id="message"]/div/div/form/div[2]/div/div/table/tbody/tr/td[2]
+    ${发送时间}    Get Text    //*[@id="message"]/div/div/form/div[2]/div/div/table/tbody/tr/td[3]
+    ${状态}    Get Text    //*[@id="message"]/div/div/form/div[2]/div/div/table/tbody/tr/td[4]/span
+    Should Be Equal As Strings    ${发送人}    ${user}
+    Should Be Equal As Strings    ${消息内容}    ${contesxt}
+    Should Be Equal As Strings    ${发送时间}    ${time}
+    Should Be Equal As Strings    ${状态}    ${status}
+
+清空已收藏消息
+    ####进入页面
+    点击菜单链接    微信设置
+    Wait Until Page Contains Element    //*[@id="navList"]/li[2]/a/span
+    ##点击消息管理    展开
+    Click Element    //*[@id="navList"]/li[4]/a/span
+    Sleep    1
+    ${sub}    Set Variable    用户消息
+    点击菜单链接    ${sub}
+    Sleep    3
+    取消所有已收藏
+
+用户消息-收藏
+    ####进入页面
+    点击菜单链接    微信设置
+    Wait Until Page Contains Element    //*[@id="navList"]/li[2]/a/span
+    ##点击消息管理    展开
+    Click Element    //*[@id="navList"]/li[4]/a/span
+    Sleep    1
+    ${sub}    Set Variable    用户消息
+    点击菜单链接    ${sub}
+    Sleep    3
+    ####查看消息
+    #随机查看一条消息    对比消息中的字段是否正确
+    ${lens}    Get Matching Xpath Count    //*[@id="main-container"]/div[1]/div[2]/div[2]/div/div/div[4]/div/div[1]/div/table/tbody/tr
+    Pass Execution If    ${lens}==0    没有用户消息，pass
+    ####任意没收藏的消息
+    #先获得未收藏的个数
+    ${msg1}    Get Matching Xpath Count    //*[@id="main-container"]/div[1]/div[2]/div[2]/div/div/div[4]/div/div[1]/div/table/tbody/tr/td[last()]/div/a[@class="grey pointer ng-scope"]
+    Click Element    //*[@id="main-container"]/div[1]/div[2]/div[2]/div/div/div[4]/div/div[1]/div/table/tbody/tr/td[last()]/div/a[@class="grey pointer ng-scope"]
+    Sleep    2
+    弹框校验    收藏成功
+    Sleep    3
+    #再次获得未收藏的个数
+    ${ms}    Get Matching Xpath Count    //*[@id="main-container"]/div[1]/div[2]/div[2]/div/div/div[4]/div/div[1]/div/table/tbody/tr/td[last()]/div/a[@class="grey pointer ng-scope"]
+    ${msg2}    Evaluate    ${ms}-1
+    Run Keyword If    ${msg1}==${msg2}    收藏成功!!!
+    Sleep    3
+    #查看已收藏是否有条记录
+    #点击已收藏
+    Click Element    //*[@id="myTab"]/li[2]/a
+    Sleep    2
+    ${lens}    Get Matching Xpath Count    //*[@id="main-container"]/div[1]/div[2]/div[2]/div/div/div[4]/div/div[2]/form/div/table/tbody/tr/td[last()]/div/a[@class="red pointer ng-scope"]
+    Run Keyword If    ${lens}==1    log    确认已收藏有条数据
+
+用户消息_取消收藏
+    ####进入页面    根据上条用例应只有一条收藏消息
+    点击菜单链接    微信设置
+    Wait Until Page Contains Element    //*[@id="navList"]/li[2]/a/span
+    ##点击消息管理    展开
+    Click Element    //*[@id="navList"]/li[4]/a/span
+    Sleep    1
+    ${sub}    Set Variable    用户消息
+    点击菜单链接    ${sub}
+    Wait Until Page Contains Element    //*[@id="myTab"]/li[2]/a
+    #点击已收藏
+    Click Element    //*[@id="myTab"]/li[2]/a
+    Sleep    2
+    Click Element    //*[@id="main-container"]/div[1]/div[2]/div[2]/div/div/div[4]/div/div[2]/form/div/table/tbody/tr/td[last()]/div/a[@class="red pointer ng-scope"]
+    Sleep    2
+    ${lens}    Get Matching Xpath Count    //*[@id="main-container"]/div[1]/div[2]/div[2]/div/div/div[4]/div/div[2]/form/div/table/tbody/tr/td[last()]/div/a[@class="red pointer ng-scope"]
+    Run Keyword If    ${lens}==0    最后一条收藏已取消
+
+用户消息-回复
+
+搜索
+    ####进入页面
+    点击菜单链接    微信设置
+    Wait Until Page Contains Element    //*[@id="navList"]/li[2]/a/span
+    ##点击消息管理    展开
+    Click Element    //*[@id="navList"]/li[4]/a/span
+    Sleep    1
+    ${sub}    Set Variable    用户消息
+    点击菜单链接    ${sub}
+    Sleep    3
+    ####消息数量
+    ${lens}    Get Matching Xpath Count    //*[@id="main-container"]/div[1]/div[2]/div[2]/div/div/div[4]/div/div[1]/div/table/tbody/tr
+    Pass Execution If    ${lens}==0    没有用户消息，pass
+    ###筛选
+    #筛选未读消息
+    Select From List By Value    //*[@id="myTab"]/div/select    1
+    Sleep    2
+    ${weidu}    Get Matching Xpath Count    //*[@id="main-container"]/div[1]/div[2]/div[2]/div/div/div[4]/div/div[1]/div/table/tbody/tr
+    Run Keyword If    ${lens}>=${weidu}    log    ok
+    Sleep    3
+    #筛选已读消息
+    Select From List By Value    //*[@id="myTab"]/div/select    2
+    Sleep    2
+    ${yidu}    Get Matching Xpath Count    //*[@id="main-container"]/div[1]/div[2]/div[2]/div/div/div[4]/div/div[1]/div/table/tbody/tr
+    Run Keyword If    ${lens}>=${yidu}    log    ok
+    #最好算出总消息数量    =    已读+未读
+
+全部标记为已读
+    ####进入页面    根据上条用例应只有一条收藏消息
+    点击菜单链接    微信设置
+    Wait Until Page Contains Element    //*[@id="navList"]/li[2]/a/span
+    ##点击消息管理    展开
+    Click Element    //*[@id="navList"]/li[4]/a/span
+    Sleep    1
+    ${sub}    Set Variable    用户消息
+    点击菜单链接    ${sub}
+    Wait Until Page Contains Element    //*[@id="myTab"]/button
+    #点击全部标记为已读
+    Click Element    //*[@id="myTab"]/button
+    Wait Until Page Contains Element    //*[@id="myTab"]/li[1]/a
+    #校验
+    #查看所有消息中的状态
+    #进入所有消息
+    Click Element    //*[@id="myTab"]/li[1]/a
+    Sleep    3
+    ${lens}    Get Matching Xpath Count    //*[@id="main-container"]/div[1]/div[2]/div[2]/div/div/div[4]/div/div[1]/div/table/tbody/tr/td[4]/span[text()="未读"]
+    Should Be Equal    ${lens}    0
+
+消息群发_文本
+    ####进入页面
+    点击菜单链接    微信设置
+    Wait Until Page Contains Element    //*[@id="navList"]/li[2]/a/span
+    ##点击消息管理    展开
+    Click Element    //*[@id="navList"]/li[4]/a/span
+    Sleep    1
+    ${sub}    Set Variable    消息群发
+    点击菜单链接    ${sub}
+    Wait Until Element Is Visible    //a[text()="发送消息"]    20
+    ####发送消息
+    Click Element    //a[text()="发送消息"]
+    Wait Until Page Contains Element    //*[@id="breadcrumbs"]/ul/li
+    ${文本}    Generate Random String    100
+    Select Frame    id=ueditor_0
+    Execute Javascript    var el=document.getElementsByTagName("p")[0];el.innerHTML = "${文本}";
+    Sleep    2
+    Press Key    //html/body    \\13
+    Sleep    1
+    Sleep    1
+    Unselect Frame
+    Sleep    3
+    Execute Javascript    document.documentElement.scrollTop=10000
+    Sleep    3
+    选择用户
+
+消息群发_图片
+    ####进入页面
+    点击菜单链接    微信设置
+    Wait Until Page Contains Element    //*[@id="navList"]/li[2]/a/span
+    ##点击消息管理    展开
+    Click Element    //*[@id="navList"]/li[4]/a/span
+    Sleep    1
+    ${sub}    Set Variable    消息群发
+    点击菜单链接    ${sub}
+    Wait Until Element Is Visible    //a[text()="发送消息"]    20
+    ####发送消息
+    Click Element    //a[text()="发送消息"]
+    Wait Until Page Contains Element    //*[@id="breadcrumbs"]/ul/li
+    #图片
+    Click Element    //*[@id="main-container"]/div[1]/div[2]/div[2]/div[4]/div/form/div[1]/div/div[1]/label[2]/input
+    Sleep    2
+    #选择图片
+    Click Element    //*[@id="picModel"]
+    Wait Until Page Contains Element    //h4[text()="选择图片"]
+    ${count}    Get Matching Xpath Count    //*[@id="main-container"]/div[3]/div/div/div[2]/div/ul/li
+    log    ${count}
+    Click Element    //*[@id="main-container"]/div[3]/div/div/div[2]/div/ul/li[${count}]
+    Sleep    3
+    #确定
+    Click Element    //*[@id="main-container"]/div[3]/div/div/div[3]/a[2]
+    Sleep    3
+    选择用户
+
+消息群发_图文
+    ####进入页面
+    点击菜单链接    微信设置
+    Wait Until Page Contains Element    //*[@id="navList"]/li[2]/a/span
+    ##点击消息管理    展开
+    Click Element    //*[@id="navList"]/li[4]/a/span
+    Sleep    1
+    ${sub}    Set Variable    消息群发
+    点击菜单链接    ${sub}
+    Wait Until Element Is Visible    //a[text()="发送消息"]    20
+    ####发送消息
+    Click Element    //a[text()="发送消息"]
+    Wait Until Page Contains Element    //*[@id="breadcrumbs"]/ul/li
+    #图片
+    Click Element    //*[@id="main-container"]/div[1]/div[2]/div[2]/div[4]/div/form/div[1]/div/div[1]/label[3]/input
+    Sleep    2
+
+*** Keywords ***
+取消所有已收藏
+    #已收藏
+    Click Element    //*[@id="myTab"]/li[2]/a
+    ${lens}    Get Matching Xpath Count    //*[@id="main-container"]/div[1]/div[2]/div[2]/div/div/div[4]/div/div[2]/form/div/table/tbody/tr/td[last()]/div/a[@class="red pointer ng-scope"]
+    Pass Execution If    ${lens}==0    已经没有数据
+    log    ${lens}
+    : FOR    ${var}    IN RANGE    ${lens}
+    \    Click Element    //*[@id="main-container"]/div[1]/div[2]/div[2]/div/div/div[4]/div/div[2]/form/div/table/tbody/tr/td[last()]/div/a[@class="red pointer ng-scope"]
+    \    Sleep    2
+    \    Confirm Action
+    \    Sleep    1.5
+    \    Click Element    //*[@id="myTab"]/li[2]/a
+    \    Sleep    2
+
+选择用户
+    [Arguments]    ${locat}=//a[text()="选择用户"]
+    Click Element    ${locat}
+    Wait Until Page Contains Element    //h4[text()="选择用户"]
+    @{用户}    Create List    1    3    5    7
+    : FOR    ${var}    IN    @{用户}
+    \    Click Element    //*[@id="userBody"]/table/tbody/tr[${var}]/td[1]/label/input
+    \    Sleep    1
+    #确定
+    Click Element    //*[@id="cardUserModal"]/div/div/form/div[3]/a[2]
+    Sleep    2

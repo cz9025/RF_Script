@@ -1,0 +1,208 @@
+*** Settings ***
+Suite Setup       启动APP
+Suite Teardown    关闭APP
+Test Setup        进入首页
+Test Teardown     失败截屏
+Test Template
+Library           AppiumLibrary
+Resource          ../Resource/系统配置.txt
+Resource          ../Resource/常用操作.txt
+
+*** Test Cases ***
+01全部商品_添加商品
+    #点击商品管理    com.dvproject.qdm:id/ll_commodity_management_lay
+    Wait Until Page Contains Element    com.dvproject.qdm:id/ll_commodity_management_lay
+    Click Element    com.dvproject.qdm:id/ll_commodity_management_lay
+    Sleep    2
+    Repeat Keyword    10    添加商品
+
+01全部商品_编辑
+    #点击商品管理
+    Click Element    com.dvproject.qdm:id/ll_commodity_management_lay
+    Sleep    2
+    Repeat Keyword    1    编辑
+
+01全部商品_下架商品
+    #点击商品管理
+    Click Element    com.dvproject.qdm:id/ll_commodity_management_lay
+    Sleep    2
+    商品上架_下架
+
+02上架_下架商品
+    [Documentation]    上架商品设置为下架
+    #点击商品管理
+    Click Element    com.dvproject.qdm:id/ll_commodity_management_lay
+    Wait Until Page Contains Element    //android.widget.TextView[@text="上架"]
+    #点击上架
+    Click Element    //android.widget.TextView[@text="上架"]
+    Sleep    2
+    Repeat Keyword    2    商品上架_下架
+
+02上架_编辑
+    [Documentation]    上架商品设置为下架
+    #点击商品管理
+    Click Element    com.dvproject.qdm:id/ll_commodity_management_lay
+    Sleep    2
+    #点击上架
+    Click Element    //android.widget.TextView[@text="上架"]
+    Sleep    2
+    编辑
+
+02上架_字段校验
+    [Documentation]    上架商品设置为下架
+    #点击商品管理
+    Click Element    com.dvproject.qdm:id/ll_commodity_management_lay
+    Sleep    2
+    #点击上架
+    Click Element    //android.widget.TextView[@text="上架"]
+    Sleep    2
+    ${title}    Get Text    //android.support.v7.widget.RecyclerView/android.widget.LinearLayout[1]/android.widget.LinearLayout/android.widget.TextView[1]
+    ${content}    Get Text    //android.support.v7.widget.RecyclerView/android.widget.LinearLayout[1]/android.widget.LinearLayout/android.widget.TextView[2]
+    ${goods_price}    Get Text    //android.support.v7.widget.RecyclerView/android.widget.LinearLayout[1]/android.widget.LinearLayout/android.widget.TextView[3]
+    ${goods_price}    Evaluate    '${goods_price}'[2:]
+    ${price_old}    Get Text    //android.support.v7.widget.RecyclerView/android.widget.LinearLayout[1]/android.widget.LinearLayout/android.widget.TextView[4]
+    ${price_old}    Evaluate    '${price_old}'[2:]
+    #点击第一个商品
+    Click Element    //android.support.v7.widget.RecyclerView/android.widget.LinearLayout[1]
+    Sleep    1
+    #校验字段
+    #
+    ${goods_title}    Get Text    com.dvproject.qdm:id/edit_goods_name
+    ${goods_desc}    Get Text    com.dvproject.qdm:id/edit_goods_desc
+    ${goos_old_price}    Get Text    com.dvproject.qdm:id/goods_goos_old_price
+    ${edit_goods_price}    Get Text    com.dvproject.qdm:id/edit_goods_price
+    Sleep    1
+    Should Be Equal As Strings    ${title}    ${goods_title}
+    Should Be Equal As Strings    ${content}    ${goods_desc}
+    Should Be Equal As Strings    ${goods_price}    ${edit_goods_price}
+    Should Be Equal As Strings    ${price_old}    ${goos_old_price}
+
+03未上架_上架商品
+    #点击商品管理
+    Click Element    com.dvproject.qdm:id/ll_commodity_management_lay
+    Wait Until Page Contains Element    //android.widget.TextView[@text="未上架"]
+    #点击未上架
+    Click Element    //android.widget.TextView[@text="未上架"]
+    Sleep    1
+    商品上架_下架
+
+03未上架_编辑
+    #点击商品管理
+    Click Element    com.dvproject.qdm:id/ll_commodity_management_lay
+    Sleep    2
+    #点击未上架
+    Click Element    //android.widget.TextView[@text="未上架"]
+    Sleep    1
+    编辑
+
+*** Keywords ***
+添加商品
+    #添加商品
+    Wait Until Page Contains Element    com.dvproject.qdm:id/btn_add
+    #添加商品按钮
+    Click Element    com.dvproject.qdm:id/btn_add
+    Wait Until Page Contains Element    com.dvproject.qdm:id/iv_pic_1    15    添加页面没有加载出来！！！
+    #商品图片
+    Click Element    com.dvproject.qdm:id/iv_pic_1
+    Sleep    2
+    小米相册选择
+    Sleep    1
+    #商品名称
+    ${title}    随机字符    [测试商品]
+    Input Text    com.dvproject.qdm:id/edit_goods_name    ${title}
+    Sleep    1
+    #商品描述
+    ${dsec}    随机字符    [商品描述]    20
+    Input Text    com.dvproject.qdm:id/edit_goods_desc    ${dsec}
+    #价格    原价    售价
+    ${price}    Evaluate    random.randint(1000, 20000)    modules=random, sys
+    ${sale}    Evaluate    random.randint(1000, 20000)    modules=random, sys
+    #商品原价
+    Input Text    com.dvproject.qdm:id/goods_goos_old_price    ${price}
+    #商品现价
+    Input Text    com.dvproject.qdm:id/edit_goods_price    ${sale}
+    #商品规格
+    Input Text    com.dvproject.qdm:id/edit_goods_size    M
+    #上架
+    Click Element    //android.widget.ScrollView/android.widget.LinearLayout/android.widget.LinearLayout[7]/android.view.View
+    #随机数为1 时则为热门商品
+    ${rand}    Generate Random String    1    01
+    Run Keyword If    ${rand}==1    Click Element    com.dvproject.qdm:id/slide_hot
+    #点击保存预览
+    Click Element    com.dvproject.qdm:id/btn_save
+    Sleep    1
+    #确认添加
+    Click Element    com.dvproject.qdm:id/btn_add
+    Sleep    1
+    #完成
+    Click Element    com.dvproject.qdm:id/btn_finish
+    Sleep    3
+    ${text1}    Get Text    //android.support.v7.widget.RecyclerView/android.widget.LinearLayout[1]/android.widget.LinearLayout/android.widget.TextView[1]
+    Should Be Equal As Strings    ${text1}    ${title}
+
+编辑
+    Sleep    1
+    ${text1}    Get Text    //android.support.v7.widget.RecyclerView/android.widget.LinearLayout[1]/android.widget.LinearLayout/android.widget.TextView[1]
+    #点击编辑按钮
+    Click Element    com.dvproject.qdm:id/btn_edit
+    #选择要删除的商品
+    Click Element    //android.support.v7.widget.RecyclerView/android.widget.LinearLayout[1]/android.widget.ImageView[1]
+    #删除商品
+    Click Element    com.dvproject.qdm:id/btn_add
+    #确定删除
+    Click Element    com.dvproject.qdm:id/tv_right
+    #点击取消    退出编辑功能
+    Click Element    com.dvproject.qdm:id/btn_edit
+    Sleep    3
+    ${text2}    Get Text    //android.support.v7.widget.RecyclerView/android.widget.LinearLayout[1]/android.widget.LinearLayout/android.widget.TextView[1]
+    Sleep    1
+    Should Not Be Equal As Strings    ${text1}    ${text2}
+    Sleep    3
+
+检查列表是否有商品
+    ${count}    Get Matching Xpath Count    //android.support.v7.widget.RecyclerView/android.widget.LinearLayout
+    log    ${count}
+    Run Keyword If    ${count}==0    添加商品
+
+小米拍照上传
+    #拍照上传
+    Click Element    com.dvproject.qdm:id/tv_service_phone
+    Sleep    3
+    #    拍照
+    Click Element    com.android.camera:id/v6_shutter_button_internal
+    Sleep    10
+    #    确认照片
+    Click Element    com.android.camera:id/v6_btn_done
+
+小米相册选择
+    #相册上传
+    Click Element    com.dvproject.qdm:id/tv_online_service
+    Sleep    5
+    #
+    Click Element    //android.widget.GridView/android.widget.RelativeLayout[1]/android.widget.ImageView
+    Sleep    3
+
+商品上架_下架
+    Sleep    2
+    检查列表是否有商品
+    ${text1}    Get Text    //android.support.v7.widget.RecyclerView/android.widget.LinearLayout[1]/android.widget.LinearLayout/android.widget.TextView[1]
+    #点击第一个商品
+    Click Element    //android.support.v7.widget.RecyclerView/android.widget.LinearLayout[1]
+    Sleep    1
+    #点击是否上架
+    Click Element    //android.widget.ScrollView/android.widget.LinearLayout/android.widget.LinearLayout[7]/android.view.View
+    Sleep    1
+    #点击保存预览
+    Click Element    com.dvproject.qdm:id/btn_save
+    Sleep    1
+    #确认添加
+    Click Element    com.dvproject.qdm:id/btn_add
+    Wait Until Page Contains Element    com.dvproject.qdm:id/btn_finish
+    #完成
+    Click Element    com.dvproject.qdm:id/btn_finish
+    Sleep    3
+    检查列表是否有商品
+    ${text2}    Get Text    //android.support.v7.widget.RecyclerView/android.widget.LinearLayout[1]/android.widget.LinearLayout/android.widget.TextView[1]
+    Sleep    1
+    Should Not Be Equal As Strings    ${text1}    ${text2}
+    Sleep    3

@@ -1,0 +1,55 @@
+*** Settings ***
+Documentation     房费数据不要超过10条
+Suite Setup       登录
+Suite Teardown    关闭浏览器
+Test Teardown
+Library           Selenium2Library
+Resource          ../Resources/常用操作.txt
+Resource          ../Resources/系统配置.txt
+
+*** Test Cases ***
+添加包厢房费
+    Wait Until Page Contains Element    xpath=//span[text()="房间管理"]
+    Click Element    xpath=//span[text()="房间管理"]
+    Wait Until Page Contains Element    xpath=//p[text()="包厢房费"]
+    Click Element    xpath=//p[text()="包厢房费"]
+    Wait Until Page Contains Element    xpath=//div[text()="添加包厢房费"]
+    Click Element    xpath=//div[text()="添加包厢房费"]
+    房费添加-修改    validateFormAdd
+
+修改包厢房费
+    Reload Page
+    Wait Until Page Contains Element    xpath=//span[text()="房间管理"]
+    Click Element    xpath=//span[text()="房间管理"]
+    Wait Until Page Contains Element    xpath=//p[text()="包厢房费"]
+    Click Element    xpath=//p[text()="包厢房费"]
+    #修改最后一条
+    Wait Until Page Contains Element    //div[@class="box-content"]//tr[last()]/td[last()]/a[1]
+    #点击修改
+    Click Element    //div[@class="box-content"]//tr[last()]/td[last()]/a[1]
+    房费添加-修改    editRome
+
+*** Keywords ***
+房费添加-修改
+    [Arguments]    ${form-name}
+    ${房费ID}    随机数    20    100
+    Input Text    //form[@name="${form-name}"]//label[starts-with(text(),"房费ID")]//following-sibling::input    ${房费ID}
+    ${时间}    随机数    3    10
+    Input Text    //form[@name="${form-name}"]//label[starts-with(text(),"时间")]//following-sibling::input    ${时间}
+    ${主播发牌房费}    随机数    100    10000
+    Input Text    //form[@name="${form-name}"]//label[starts-with(text(),"主播发牌房费")]//following-sibling::input    ${主播发牌房费}
+    ${主播陪玩房费}    随机数    100    10000
+    Input Text    //form[@name="${form-name}"]//label[starts-with(text(),"主播陪玩房费")]//following-sibling::input    ${主播陪玩房费}
+    ${无视频房费}    随机数    100    1000
+    Input Text    //form[@name="${form-name}"]//label[starts-with(text(),"无视频房费")]//following-sibling::input    ${无视频房费}
+    等待时间    1
+    Click Button    //form[@name="${form-name}"]//button[text()="保存"]
+    等待时间    2
+    #校验
+    Page Should Contain Element    //div[@class="box-content"]//td[2][text()="${房费ID}"]    没有找到房费ID=${房费ID}
+    ${time}    Get Text    //div[@class="box-content"]//td[2][text()="${房费ID}"]/following-sibling::td[1]
+    ${发牌费}    Get Text    //div[@class="box-content"]//td[2][text()="${房费ID}"]/following-sibling::td[2]
+    ${陪玩费}    Get Text    //div[@class="box-content"]//td[2][text()="${房费ID}"]/following-sibling::td[3]
+    ${无视频费}    Get Text    //div[@class="box-content"]//td[2][text()="${房费ID}"]/following-sibling::td[4]
+    Run Keyword If    ${时间}==${time} and ${主播发牌房费}==${发牌费} and ${主播陪玩房费}==${陪玩费} and ${无视频房费}==${无视频费}    log    success!!!
+    ...    ELSE    添加的房费与查询的不一致!!!

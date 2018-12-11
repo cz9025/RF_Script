@@ -1,0 +1,74 @@
+*** Settings ***
+Library           FakerLibrary
+
+*** Test Cases ***
+尝试
+    #    造数据
+    #
+    ${ss}    Address
+    log    ${ss}
+    #    上午下午
+    ${AmPm}    Am Pm
+    log    ${AmPm}
+    #
+    ${Binary}    Binary    12
+    log    ${Binary}
+    #    布尔值    什么鬼
+    ${Boolean}    Boolean
+    log    ${Boolean}
+    #造句子    单词数量
+    ${word1}    Sentences    10
+    log    ${word1}
+    #    单词数量    第二个参数设置为false可能会减少数量
+    ${word2}    Sentence    10
+    log    ${word2}
+    #    城市
+    ${city}    City
+    log    ${city}
+    #    城市前缀
+    ${prefix}    City Prefix
+    log    ${prefix}
+    #    城市后缀
+    ${suffix}    City Suffix
+    log    ${suffix}
+    #    带颜色的名字
+    ${name}    Color Name
+    log    ${name}
+    #    公司
+    ${company}    Company
+    log    ${company}
+    #    邮箱
+    ${companyemail}    Company Email
+    log    ${companyemail}
+    #    公司名后缀
+    ${companysuffix}    Company Suffix
+    log    ${companysuffix}
+    #    国家
+    ${country}    Country
+    log    ${country}
+    #    国家编号
+    ${ccode}    Country Code
+    log    ${ccode}
+    #    信用卡到期日
+    ${expire}    Credit Card Expire
+    #    信用卡全部信息
+    ${full}    Credit Card Full
+     #     信用卡号码
+    ${number}    Credit Card Number
+    #
+    ${provider}    Credit Card Provider
+    #    信用卡安全码
+    ${ccscode}    Credit Card Security Code
+    #
+    ${currencycode}    Currency Code
+    #     日期相关的
+    ${date}    date
+    ${object}    Date Object
+    ${time}    Date Time
+    ${ad}    Date Time Ad
+    ${between}    Date Time Between
+    ${dtbd}    Date Time Between Dates
+    ${dttc}    Date Time This Century
+    ${dttd}    Date Time This Decade
+    ${dttm}    Date Time This Month
+    ${dtty}    Date Time This Year

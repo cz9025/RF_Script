@@ -1,0 +1,202 @@
+*** Settings ***
+Documentation     用例能独立运行
+...
+...
+...               用户的非必填信息已提出
+Suite Setup       登录
+Suite Teardown    关闭浏览器
+Test Teardown
+Library           Selenium2Library
+Resource          ../Resources/常用操作.txt
+Resource          ../Resources/系统配置.txt
+Resource          ../Resources/BaseData.txt
+
+*** Test Cases ***
+添加主播
+    Comment    点击账号管理
+    Wait Until Page Contains Element    xpath=//span[text()="账号管理"]
+    Click Element    xpath=//span[text()="账号管理"]
+    等待时间    1
+    Click Element    xpath=//p[text()="主播账号管理"]
+    等待时间    2
+    #添加主播
+    ${帐号}    随机字符    ${account.a}    7
+    ${密码}    Set Variable    ${pwd.a}
+    ${昵称}    随机字符    ${nick.a}    7
+    Click Element    xpath=//div[@class="add"]
+    等待时间    1
+    Input Text    xpath=//div[@class="edit_course"]//form[@name="htAddUser"]//label[text()="账号："]/following-sibling::input    ${帐号}
+    等待时间    1
+    Input Text    id=addPassword    ${密码}
+    等待时间    1
+    Input Text    xpath=//div[@class="edit_course"]//form[@name="htAddUser"]//label[text()="昵称："]/following-sibling::input    ${昵称}
+    等待时间    1
+    Comment    点击选择房间
+    Click Element    xpath=//div[@class="edit_course"]//form[@name="htAddUser"]//label[text()="房间："]/following-sibling::button
+    等待时间    1
+    ${rooms}    Get Matching Xpath Count    xpath=//div[@class="edit_course"]//form[@name="htAddUser"]/div[@class="tableList"]/table/tbody/tr
+    #没有房间要做处理
+    Run Keyword If    ${rooms}==0    Fail    没有可用房间，需添加
+    选择房间    ${rooms}
+    等待时间    1
+    #非必填
+    主播-非必填
+    等待时间    1
+    Comment    保存
+    Click Element    xpath=//div[@class="edit_course"]//form[@name="htAddUser"]/div[last()]/button
+    等待时间    2
+    Comment    判断列表是否存在该元素    判断名称
+    Wait Until Page Contains Element    xpath=//div[@class="tableList"]/div[1]/table/tbody/tr[1]/td[text()="${帐号}"]
+    Page Should Contain Element    xpath=//div[@class="tableList"]/div[1]/table/tbody/tr[1]/td[text()="${帐号}"]    刚添加的元素不存在
+    log    success!
+
+修改主播
+    Comment    先刷新页面    不然再次点击左侧列表会隐藏
+    Reload Page
+    Comment    点击账号管理
+    Wait Until Page Contains Element    xpath=//span[text()="账号管理"]
+    Click Element    xpath=//span[text()="账号管理"]
+    等待时间    1
+    Comment    点击主播帐号管理
+    Click Element    xpath=//p[text()="主播账号管理"]
+    Comment    修改主播    只修改自己添加的
+    Page Should Contain Element    //div[@class='box-content']/table/tbody//td[starts-with( text(),"${account.a}") or starts-with( text(),"${account.u}")]    没有自己添加的主播
+    ${userCount}    Get Text    //div[@class='box-content']/table/tbody//td[starts-with( text(),"${account.a}") or starts-with( text(),"${account.u}")]
+    Comment    聚焦
+    Focus    //div[@class='box-content']/table/tbody//td[starts-with( text(),"${account.a}") or starts-with( text(),"${account.u}")]/../td[last()]/a[1]
+    Comment    点击修改
+    Click Element    //div[@class='box-content']/table/tbody//td[starts-with( text(),"${account.a}") or starts-with( text(),"${account.u}")]/../td[last()]/a[1]
+    等待时间    2
+    ${昵称}    随机字符    ${nick.u}    7
+    Input Text    xpath=//div[@class="edit_course"]//form[@name="htAddUser"]//label[text()="昵称："]/following-sibling::input    ${昵称}
+    等待时间    1
+    Comment    选择房间
+    Click Element    xpath=//div[@class="edit_course"]//form[@name="htAddUser"]//label[text()="房间："]/following-sibling::button
+    等待时间    1
+    ${rooms}    Get Matching Xpath Count    xpath=//div[@class="edit_course"]//form[@name="htAddUser"]/div[@class="tableList"]/table/tbody/tr
+    #没有房间    关闭这个
+    Run Keyword If    ${rooms}==0    Click Element    //div[@class="edit_course"]//form[@name="htAddUser"]/div[1]/span
+    ...    ELSE    选择房间    ${rooms}
+    #非必填
+    主播-非必填
+    等待时间    1
+    #VIP等级
+    Click Element    xpath=//div[@class="edit_course"]//form[@name="htAddUser"]//label[text()="VIP等级："]/following-sibling::select
+    ${vip}    Get Matching Xpath Count    xpath=//div[@class="edit_course"]//form[@name="htAddUser"]//label[text()="VIP等级："]/following-sibling::select/option
+    ${rand}    随机数    1    ${vip}
+    Click Element    xpath=//div[@class="edit_course"]//form[@name="htAddUser"]//label[text()="VIP等级："]/following-sibling::select/option[${rand}]
+    等待时间    1
+    #用户等级
+    Click Element    xpath=//div[@class="edit_course"]//form[@name="htAddUser"]//label[text()="用户等级："]/following-sibling::select
+    ${usr}    Get Matching Xpath Count    xpath=//div[@class="edit_course"]//form[@name="htAddUser"]//label[text()="用户等级："]/following-sibling::select/option
+    ${rand}    随机数    1    ${usr}
+    Click Element    xpath=//div[@class="edit_course"]//form[@name="htAddUser"]//label[text()="用户等级："]/following-sibling::select/option[${rand}]
+    等待时间    1
+    Comment    保存
+    Click Element    xpath=//div[@class="edit_course"]//form[@name="htAddUser"]/div[last()]/button
+    等待时间    3
+    Comment    判断列表是否存在该元素    判断名称
+    Page Should Contain Element    xpath=//div[@class="tableList"]/div[1]/table/tbody/tr[1]/td[text()="${昵称}"]    刚修改的主播${userCount}不存在
+    等待时间    1
+    #判断用户等级    经验值
+    ${经验值}    Get Text    //div[@class='box-content']/table/tbody//td[starts-with( text(),"${nick.a}") or starts-with( text(),"${nick.u}")]/../td[19]
+    Run Keyword If    ${rand}>1    Should Be True    ${经验值}>=1000
+    log    success!
+
+搜索主播
+    Comment    先刷新页面    不然再次点击左侧列表会隐藏
+    Reload Page
+    Comment    点击账号管理
+    Wait Until Page Contains Element    xpath=//span[text()="账号管理"]
+    Click Element    xpath=//span[text()="账号管理"]
+    等待时间    1
+    Comment    点击主播帐号管理
+    Click Element    xpath=//p[text()="主播账号管理"]
+    Comment    先获得一条数据
+    Page Should Contain Element    //div[@class='box-content']/table/tbody//td[starts-with( text(),"${account.a}") or starts-with( text(),"${account.u}")]    没有自己添加的主播
+    ${id}    Get Text    //div[@class='box-content']/table/tbody//td[starts-with( text(),"${account.a}") or starts-with( text(),"${account.u}")]/../td[1]
+    ${账号}    Get Text    //div[@class='box-content']/table/tbody//td[starts-with( text(),"${account.a}") or starts-with( text(),"${account.u}")]/../td[2]
+    ${昵称}    Get Text    //div[@class='box-content']/table/tbody//td[starts-with( text(),"${account.a}") or starts-with( text(),"${account.u}")]/../td[3]
+    ${房间标识}    Get Text    //div[@class='box-content']/table/tbody//td[starts-with( text(),"${account.a}") or starts-with( text(),"${account.u}")]/../td[13]
+    搜索内容    byAnchorId    ${id}
+    搜索内容    byAccount    ${账号}
+    搜索内容    byNickname    ${昵称}
+    搜索内容    byRoomBs    ${房间标识}
+
+*** Keywords ***
+搜索内容
+    [Arguments]    ${value}    ${id}
+    Comment    搜索
+    Select From List By Value    id=qtType    ${value}
+    等待时间    1
+    Input Text    //input[@ng-model="qtType.searchText"]    ${id}
+    等待时间    0.5
+    Click Element    //div[@class="inqu"]/button
+    ${len}    Get Matching Xpath Count    xpath=//div[@class='box-content']/table/tbody/tr
+    ${txt}    Get Text    //div[@class="pagers"]/div[1]/div[2]/span/strong
+    Run Keyword If    ${txt}==1    log    success!
+    ...    ELSE    log    查询${id}结果错误！
+    Run Keyword If    ${len}==1    log    success!
+    ...    ELSE    log    查询${id}结果错误！
+    等待时间    2
+
+主播-非必填
+    ${num}    随机数    100    999
+    ${height}    随机数    150    190
+    ${sex}    随机数    1    2
+    等待时间
+    #工会
+    Input Text    xpath=//div[@class="edit_course"]//form[@name="htAddUser"]//label[text()="公会："]/following-sibling::input    ${num}
+    等待时间    1
+    #性别
+    Click Element    xpath=//div[@class="edit_course"]//form[@name="htAddUser"]//label[text()="性别："]/following-sibling::div[${sex}]/label
+    等待时间    1
+    #身高
+    Input Text    xpath=//div[@class="edit_course"]//form[@name="htAddUser"]//label[text()="身高："]/following-sibling::input    ${height}
+    等待时间    1
+    #星座
+    Click Element    xpath=//div[@class="edit_course"]//form[@name="htAddUser"]//label[text()="星座："]/following-sibling::select
+    等待时间    1
+    ${rand}    随机数    2    13
+    Click Element    xpath=//div[@class="edit_course"]//form[@name="htAddUser"]//label[text()="星座："]/following-sibling::select/option[${rand}]
+    等待时间    2
+    Comment    籍贯
+    Comment    #省
+    Click Element    xpath=//div[@class="edit_course"]//form[@name="htAddUser"]//label[text()="籍贯："]/following-sibling::select[1]
+    ${options}    Get Matching Xpath Count    xpath=//div[@class="edit_course"]//form[@name="htAddUser"]//label[text()="籍贯："]/following-sibling::select[1]/option
+    ${rand}    随机数    2    32
+    Click Element    xpath=//div[@class="edit_course"]//form[@name="htAddUser"]//label[text()="籍贯："]/following-sibling::select[1]/option[${rand}]
+    等待时间    2
+    Comment    #市
+    Click Element    xpath=//div[@class="edit_course"]//form[@name="htAddUser"]//label[text()="籍贯："]/following-sibling::select[2]
+    ${options}    Get Matching Xpath Count    xpath=//div[@class="edit_course"]//form[@name="htAddUser"]//label[text()="籍贯："]/following-sibling::select[2]/option
+    #因为能定位到2个，数量减半
+    ${options}    Evaluate    ${options}
+    ${rand}    随机数    2    ${options}
+    Click Element    xpath=//div[@class="edit_course"]//form[@name="htAddUser"]//label[text()="籍贯："]/following-sibling::select[2]/option[${rand}]
+    等待时间    2
+    Comment    #区
+    Click Element    xpath=//div[@class="edit_course"]//form[@name="htAddUser"]//label[text()="籍贯："]/following-sibling::select[3]
+    ${options}    Get Matching Xpath Count    xpath=//div[@class="edit_course"]//form[@name="htAddUser"]//label[text()="籍贯："]/following-sibling::select[3]/option
+    ${options}    Evaluate    ${options}
+    ${rand}    随机数    2    ${options}
+    Click Element    xpath=//div[@class="edit_course"]//form[@name="htAddUser"]//label[text()="籍贯："]/following-sibling::select[3]/option[${rand}]
+    等待时间    2
+    Comment    #生日
+    Click Element    xpath=//div[@class="edit_course"]//form[@name="htAddUser"]//label[text()="生日："]/following-sibling::input
+    等待时间    1
+    Select Frame    xpath=//iframe[@hidefocus="true"]
+    等待时间    1
+    Click Element    id=dpTodayInput
+    等待时间
+    Unselect Frame
+
+选择房间
+    [Arguments]    ${rooms}
+    等待时间    2
+    ${n}    随机数    1    ${rooms}
+    #随机选择一个房间
+    Click Element    xpath=//div[@class="edit_course"]//form[@name="htAddUser"]//tbody/tr[${n}]/td[1]/input
+    等待时间    2
+    Comment    提交
+    Click Element    xpath=//div[@class="edit_course"]//div[@class="handel"]/button

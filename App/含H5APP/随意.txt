@@ -1,0 +1,45 @@
+*** Settings ***
+Library           AppiumLibrary
+
+*** Test Cases ***
+定位
+    Set Appium Timeout    20
+    #    resetKeyboard=True屏蔽软键盘    unicodeKeyboard=True使用unicode编码方式发送字符串
+    #${androidProcess}= \    \ Create Dictionary \ \ \    androidProcess=${Process}
+    Open Application    http://127.0.0.1:4723/wd/hub    platformName=Android    platformVersion=6.0.1    deviceName=5b556707    appPackage=com.tentinet.bydfans    appActivity=com.tentinet.bydfans.commentbase.activity.LoadingActivity
+    ...    unicodeKeyboard=True    resetKeyboard=True    WebContentsDebuggingEnabled=True    #chromeOptions=${androidProcess}
+    Sleep    5
+    ${activity}    Get Activity
+    Sleep    5
+    Click Element    com.tentinet.bydfans:id/radio_shopping
+    ${contxt}    Get Contexts
+    log    ${contxt}
+    #    NATIVE_APP
+    ${context_name}    Set Variable    WEBVIEW
+    #     切换到webview
+    #Switch To Context    ${context_name}
+    #com.tentinet.bydfans:id/wv_shopping
+    Sleep    5
+    #     上滑
+    Swipe    400    1400    400    700
+    Sleep    1
+    #     点击一个商品
+    Click Element    //android.webkit.WebView/android.view.View[1]/android.view.View[3]/android.widget.ListView/android.view.View[2]
+    Sleep    5
+    ${context}    Get Current Context
+    ${source}    Get Source
+    log    ${source}
+    ${activity}    Get Activity
+    log    ${activity}
+    ${context}    Get Current Context
+    log    ${context}
+    Go Back
+    Sleep    5
+    #     首页
+    Click Element    com.tentinet.bydfans:id/radio_home
+    Sleep    5
+    ${ac}    Get Activity
+    #     迪车会
+    Click Element    com.tentinet.bydfans:id/radio_club
+    Sleep    5
+    ${dch}    Get Activity

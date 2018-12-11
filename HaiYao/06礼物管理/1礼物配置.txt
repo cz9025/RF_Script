@@ -1,0 +1,214 @@
+*** Settings ***
+Documentation     运行修改礼物、删除礼物一定要勾选添加礼物；
+...               其中包含了添加，修改，单个删除，批量删除。
+...
+...
+...
+...               能独立运行
+Suite Setup       登录
+Suite Teardown    关闭浏览器
+Test Teardown
+Library           Selenium2Library
+Resource          ../Resources/常用操作.txt
+Resource          ../Resources/系统配置.txt
+Resource          ../Resources/BaseData.txt
+Library           AutoItLibrary
+
+*** Test Cases ***
+添加礼物
+    Comment    点击礼物管理
+    等待时间    3
+    Click Element    xpath=//span[text()="礼物管理"]
+    等待时间    1
+    Comment    点击礼物配置
+    Click Element    xpath=//p[text()="礼物配置"]
+    Wait Until Page Contains Element    xpath=//div[text()="添加礼物"]
+    ${礼物名称}    随机字符    ${name.a}    8
+    礼物添加    ${礼物名称}
+    #校验    即查询
+    按礼物名称查询    ${礼物名称}
+    结果校验    1
+    礼物状态校验    ${礼物名称}    7    禁用
+
+修改礼物
+    Reload Page
+    Comment    点击礼物管理
+    Wait Until Page Contains Element    xpath=//span[text()="礼物管理"]
+    Click Element    xpath=//span[text()="礼物管理"]
+    等待时间    1
+    Comment    点击礼物配置
+    Click Element    xpath=//p[text()="礼物配置"]
+    名称修改-删除    2
+    Comment    礼物名称
+    ${礼物名称}    随机字符    ${name.u}    8
+    礼物添加-修改    ${礼物名称}
+    等待时间    2
+    #校验    即查询
+    按礼物名称查询    ${礼物名称}
+    结果校验    1
+    礼物状态校验    ${礼物名称}    7    禁用
+
+删除礼物
+    Reload Page
+    Comment    点击礼物管理
+    Wait Until Page Contains Element    xpath=//span[text()="礼物管理"]
+    Click Element    xpath=//span[text()="礼物管理"]
+    等待时间    1
+    Comment    点击礼物配置
+    Click Element    xpath=//p[text()="礼物配置"]
+    ${礼物名称}    名称修改-删除    3
+    #处理删除对话框
+    确认删除
+    按礼物名称查询    ${礼物名称}
+    结果校验    0
+
+批量删除礼物
+    Reload Page
+    Wait Until Page Contains Element    xpath=//span[text()="礼物管理"]
+    Click Element    xpath=//span[text()="礼物管理"]
+    等待时间    1
+    Click Element    xpath=//p[text()="礼物配置"]
+    等待时间    3
+    #随机添加2-5条数据    添加完成后再批量删除
+    ${num}    Evaluate    random.randint(2,5)    modules=random
+    ${礼物名称}    随机字符    【礼物名称】    6
+    Repeat Keyword    ${num}    礼物添加    ${礼物名称}
+    #校验    即查询
+    按礼物名称查询    ${礼物名称}
+    结果校验    ${num}
+    #批量删除
+    Comment    全选
+    Click Element    xpath=//div[@class="box-content"]/table/thead/tr/th[1]/input
+    等待时间    1
+    Comment    批量删除
+    Click Element    xpath=//button[@ng-click="dele()" and text()="批量删除"]
+    等待时间    2
+    #处理删除对话框
+    Click Element    xpath=//div[@class="delete"]/div[2]/button[2]
+    按礼物名称查询    ${礼物名称}
+    结果校验    0
+
+按类型查询
+    Reload Page
+    Wait Until Page Contains Element    xpath=//span[text()="礼物管理"]
+    Comment    点击礼物管理
+    等待时间    3
+    Click Element    xpath=//span[text()="礼物管理"]
+    等待时间    1
+    Comment    点击礼物配置
+    Click Element    xpath=//p[text()="礼物配置"]
+    等待时间    3
+    #先获得所有数量
+    ${all}    Get Text    xpath=//div[@class="pagers"]/div/div[2]/span/strong    #类型    log    # 不需要使用金币
+    等待时间    1
+    #普通
+    Select From List By Value    xpath=//select[@ng-model="reportData.giftType"]    0    #点击查询    log    # 不需要使用金豆
+    Click Button    xpath=//button[text()="查询"]
+    等待时间    1
+    ${pu}    Get Text    xpath=//div[@class="pagers"]/div/div[2]/span/strong
+    #福袋
+    Select From List By Value    xpath=//select[@ng-model="reportData.giftType"]    1
+    #点击查询
+    Click Button    xpath=//button[text()="查询"]
+    等待时间    1
+    ${fu}    Get Text    xpath=//div[@class="pagers"]/div/div[2]/span/strong
+    等待时间    1
+    ${num}    Evaluate    ${pu}+${fu}
+    Run Keyword If    ${all}==${num}    log    查询数量正确
+    ...    ELSE    查询数量错误，所有${all}-普通${pu}-福袋${fu}
+
+*** Keywords ***
+礼物添加
+    [Arguments]    ${礼物名称}
+    Comment    添加礼物
+    Click Element    xpath=//div[text()="添加礼物"]
+    Comment    目标公司
+    Select From List By Value    xpath=//div[@class="edit_course"]//div[@class="modalContent"]/form//label[starts-with(text(),"目标公司：")]/following-sibling::select    0
+    礼物添加-修改    ${礼物名称}
+
+礼物添加-修改
+    [Arguments]    ${礼物名称}
+    等待时间    1
+    Comment    礼物名称
+    Input Text    xpath=//div[@class="edit_course"]//div[@class="modalContent"]/form//label[starts-with(text(),"礼物名称：")]/following-sibling::input    ${礼物名称}
+    等待时间    1
+    Comment    礼物标识
+    ${礼物标识}    随机数    999    999999
+    Input Text    xpath=//div[@class="edit_course"]//div[@class="modalContent"]/form//label[starts-with(text(),"礼物标识：")]/following-sibling::input    ${礼物标识}
+    #类型
+    #
+    Comment    主播分成值
+    ${主播分成值}    随机数    1    9
+    ${分成值}    Evaluate    ${主播分成值}*0.1
+    Input Text    xpath=//div[@class="edit_course"]//div[@class="modalContent"]/form//label[starts-with(text(),"主播分成值：")]/following-sibling::input    0.5
+    Comment    经验值
+    ${经验值}    随机数    100    1000
+    Input Text    xpath=//div[@class="edit_course"]//div[@class="modalContent"]/form//label[starts-with(text(),"经验值：")]/following-sibling::input    ${经验值}
+    Comment    是否使用金币
+    ${金币}    随机数    1    2
+    Click Element    xpath=//div[@class="edit_course"]//div[@class="modalContent"]/form//label[starts-with(text(),"是否使用金币：")]//following-sibling::div[${金币}]/label/input
+    ${消耗金币}    随机数    10    100
+    #如果选择的是使用金币    则执行
+    Run Keyword If    ${金币}==1    Input Text    xpath=//div[@class="edit_course"]//div[@class="modalContent"]/form//label[starts-with(text(),"消耗金币")]//following-sibling::input    ${消耗金币}
+    ...    ELSE    log    不需要使用金币
+    Comment    是否使用金豆
+    ${金豆}    随机数    1    2
+    Click Element    xpath=//div[@class="edit_course"]//div[@class="modalContent"]/form//label[starts-with(text(),"是否使用金豆：")]//following-sibling::div[${金豆}]/label/input
+    Run Keyword If    ${金豆}==1    Input Text    xpath=//div[@class="edit_course"]//div[@class="modalContent"]/form//label[starts-with(text(),"消耗金豆")]//following-sibling::input    ${经验值}
+    ...    ELSE    log    不需要使用金豆
+    选择图片
+    等待时间    1
+    ${text}    随机字符    ${desc.a}    50
+    Input Text    xpath=//div[@class="edit_course"]//div[@class="modalContent"]/form//label[starts-with(text(),"礼物描述：")]//following-sibling::textarea    ${text}
+    等待时间    1
+    #禁用    自己添加的禁用
+    Click Element    xpath=//div[@class="edit_course"]//div[@class="modalContent"]/form//label[starts-with(text(),"状态：")]//following-sibling::div[2]/label
+    等待时间    1
+    Click Button    xpath=//div[@class="edit_course"]//div[@class="modalContent"]/form//button
+    等待时间    1
+
+按礼物名称查询
+    [Arguments]    ${礼物名称}
+    等待时间    2
+    Comment    按礼物名称查询
+    Input Text    xpath=//input[@ng-model="reportData.name"]    ${礼物名称}
+    等待时间    1
+    Click Button    //button[@ng-click="seacher(reportData)"]
+    等待时间    2
+
+选择图片
+    Comment    全屏动画
+    Click Element    xpath=//div[@class="edit_course"]//div[@class="modalContent"]/form//label[starts-with(text(),"全屏动画：")]/span[1]
+    等待时间    2
+    Control Send    打开    ${EMPTY}    [CLASS:Edit; INSTANCE:1]    E:\\swf.swf
+    等待时间    1
+    Control Click    打开    ${EMPTY}    Button1    LEFT
+    等待时间    1
+    Comment    礼物图片
+    Click Element    xpath=//div[@class="edit_course"]//div[@class="modalContent"]/form//label[starts-with(text(),"礼物图片：")]/span[2]
+    等待时间    1
+    Control Send    打开    ${EMPTY}    [CLASS:Edit; INSTANCE:1]    E:\\pic.png
+    等待时间    1
+    Control Click    打开    ${EMPTY}    Button1    LEFT
+    等待时间    1
+    Comment    礼物GIF
+    Click Element    xpath=//div[@class="edit_course"]//div[@class="modalContent"]/form//label[starts-with(text(),"礼物GIF：") or starts-with(text(),"礼物gif：")]/span[2]
+    等待时间    1
+    Control Send    打开    ${EMPTY}    [CLASS:Edit; INSTANCE:1]    E:\\smile.gif
+    等待时间    1
+    Control Click    打开    ${EMPTY}    Button1    LEFT
+    等待时间    1
+    Comment    小图标
+    Click Element    xpath=//div[@class="edit_course"]//div[@class="modalContent"]/form//label[starts-with(text(),"小图标：")]/span[2]
+    等待时间    1
+    Control Send    打开    ${EMPTY}    [CLASS:Edit; INSTANCE:1]    E:\\pic117.png
+    等待时间    1
+    Control Click    打开    ${EMPTY}    Button1    LEFT
+    等待时间    1
+    Comment    横幅背景
+    Click Element    xpath=//div[@class="edit_course"]//div[@class="modalContent"]/form//label[starts-with(text(),"横幅背景：")]/span[2]
+    等待时间    1
+    Control Send    打开    ${EMPTY}    [CLASS:Edit; INSTANCE:1]    E:\\pic117.png
+    等待时间    1
+    Control Click    打开    ${EMPTY}    Button1    LEFT
+    等待时间    1

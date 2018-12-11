@@ -1,0 +1,21 @@
+*** Settings ***
+Test Teardown
+Library           Selenium2Library
+Resource          Resource/常用操作.robot
+
+*** Test Cases ***
+刷新页面
+    Open Browser    http://www.baidu.com    chrome
+    Maximize Browser Window
+    Set Browser Implicit Wait    20
+    Input Text    id=kw    cz9025
+    Sleep    1
+    Click Element    id=su
+    Sleep    5
+    #获得当前页面的网址
+    ${url}    Get Location
+    log    ${url}
+    #Reload Page
+    Should Contain    1    2
+    Sleep    8
+    Close Browser

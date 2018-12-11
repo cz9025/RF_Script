@@ -1,0 +1,348 @@
+*** Settings ***
+Suite Setup       登录
+Suite Teardown    关闭浏览器
+Test Teardown     失败重启
+Resource          ../Resource/常用操作.robot
+Resource          ../Resource/配置参数.robot
+
+*** Test Cases ***
+1积分活动-添加1
+    ####进入页面
+    点击菜单链接    微营销
+    Wait Until Page Contains Element    //*[@id="breadcrumbs"]/ul/li    #等待 ‘秒杀活动管理’ 显示
+    ${sub}    Set Variable    积分活动
+    点击菜单链接    ${sub}
+    Sleep    3
+    点击菜单链接    添加积分活动
+    Wait Until Page Contains Element    //*[@id="breadcrumbs"]/ul/li    #等待 ‘添加送积分活动’ 显示
+    ##输入图文标题
+    ${标题}    随机字符    【积分活动】    12
+    Input Text    //*[@id="main-container"]/div/div[2]/div[2]/div/div/form/div[1]/div/input    ${标题}
+    Sleep    3
+    #满多少元送多少积分
+    Input Text    //*[@id="main-container"]/div/div[2]/div[2]/div/div/form/div[5]/div/div[1]/input    10
+    Sleep    1
+    Input Text    //*[@id="main-container"]/div/div[2]/div[2]/div/div/form/div[5]/div/div[2]/input    100
+    : FOR    ${var}    IN RANGE    4
+    \    ${ss}    Evaluate    ${var}+1
+    \    Click Element    //*[@id="main-container"]/div/div[2]/div[2]/div/div/form/div[7]/div[${ss}]/label/input
+    \    Sleep    1
+    #保存
+    Click Element    //*[@id="modal-footer"]/a[2]
+    Sleep    3
+    弹框校验
+    #开启状态
+    Wait Until Page Contains Element    //*[@id="breadcrumbs"]/ul/li    #等待 ‘积分活动’ 显示
+    Click Element    //*[@id="main-container"]/div[1]/div[2]/div[2]/div/div/div/div/div[1]/form/table/tbody/tr[1]/td[4]/label/input
+    Sleep    3
+    弹框校验    已启用
+
+1积分活动-添加2
+    ####进入页面
+    点击菜单链接    微营销
+    Wait Until Page Contains Element    //*[@id="breadcrumbs"]/ul/li    #等待 ‘秒杀活动管理’ 显示
+    ${sub}    Set Variable    积分活动
+    点击菜单链接    ${sub}
+    Sleep    3
+    点击菜单链接    添加积分活动
+    Wait Until Page Contains Element    //*[@id="breadcrumbs"]/ul/li    #等待 ‘添加送积分活动’ 显示
+    ##输入图文标题
+    ${标题}    随机字符    【积分活动】有限制-    12
+    Input Text    //*[@id="main-container"]/div/div[2]/div[2]/div/div/form/div[1]/div/input    ${标题}
+    Sleep    3
+    #活动时间
+    Select From List By Value    //*[@id="main-container"]/div/div[2]/div[2]/div/div/form/div[2]/div/select    1
+    Sleep    3
+    #活动时间
+    ${start}    Get Time    \    NOW+1h
+    ${year}    Get Time    year    NOW
+    ${month}    Get Time    month    NOW
+    ${day}    Get Time    day    NOW+48h
+    ${end}    Set Variable    ${year}-${month}-${day} 10:10:10
+    log    ${end}
+    #开始时间
+    Input Text    //*[@id="start_time"]    ${start}
+    Sleep    2
+    #结束时间
+    Input Text    //*[@id="end_time"]    ${end}
+    #其他地方点击下，隐藏时间
+    Click Element    //*[@id="main-container"]/div/div[2]/div[2]/div/div/form/div[1]/div/input
+    Sleep    2
+    #满多少元送多少积分
+    Input Text    //*[@id="main-container"]/div/div[2]/div[2]/div/div/form/div[5]/div/div[1]/input    10
+    Sleep    1
+    Input Text    //*[@id="main-container"]/div/div[2]/div[2]/div/div/form/div[5]/div/div[2]/input    100
+    : FOR    ${var}    IN RANGE    4
+    \    ${ss}    Evaluate    ${var}+1
+    \    Click Element    //*[@id="main-container"]/div/div[2]/div[2]/div/div/form/div[7]/div[${ss}]/label/input
+    \    Sleep    1
+    #保存
+    Click Element    //*[@id="modal-footer"]/a[2]
+    Sleep    3
+    弹框校验
+    #开启状态
+    Wait Until Page Contains Element    //*[@id="breadcrumbs"]/ul/li    #等待 ‘积分活动’ 显示
+    Click Element    //*[@id="main-container"]/div[1]/div[2]/div[2]/div/div/div/div/div[1]/form/table/tbody/tr[1]/td[4]/label/input
+    Sleep    3
+    弹框校验    已启用
+
+2积分抵扣活动-添加1
+    ####进入页面
+    点击菜单链接    微营销
+    Wait Until Page Contains Element    //*[@id="breadcrumbs"]/ul/li    #等待 ‘秒杀活动管理’ 显示
+    ${sub}    Set Variable    积分活动
+    点击菜单链接    ${sub}
+    Sleep    3
+    点击菜单链接    积分抵扣活动
+    Wait Until Page Contains Element    //*[@id="breadcrumbs"]/ul/li    #等待 ‘添加送积分活动’ 显示
+    点击菜单链接    添加抵扣活动
+    Sleep    3
+    ##输入图文标题
+    ${标题}    随机字符    【积分抵扣活动】无限制-    12
+    Input Text    //*[@id="main-container"]/div/div[2]/div[2]/div/div/form/div[1]/div/input    ${标题}
+    Sleep    3
+    #订单限额
+    Input Text    //*[@id="main-container"]/div/div[2]/div[2]/div/div/form/div[4]/div/input    10
+    Sleep    2
+    #满多少积分送多少元
+    Input Text    //*[@id="main-container"]/div/div[2]/div[2]/div/div/form/div[5]/div/div[1]/input    10
+    Sleep    1
+    Input Text    //*[@id="main-container"]/div/div[2]/div[2]/div/div/form/div[5]/div/div[2]/input    10
+    Sleep    1
+    #抵扣金额
+    Input Text    //*[@id="main-container"]/div/div[2]/div[2]/div/div/form/div[7]/div/input    5
+    : FOR    ${var}    IN RANGE    4
+    \    ${ss}    Evaluate    ${var}+1
+    \    Click Element    //*[@id="main-container"]/div/div[2]/div[2]/div/div/form/div[8]/div[${ss}]/label/input
+    \    Sleep    1
+    #保存
+    Click Element    //*[@id="btnConfirm"]
+    Sleep    3
+    弹框校验
+    #开启状态
+    Wait Until Page Contains Element    //*[@id="breadcrumbs"]/ul/li    #等待 ‘积分活动’ 显示
+    Click Element    //*[@id="main-container"]/div/div[2]/div[2]/div/div/div/div/div[1]/form/table/tbody/tr[1]/td[6]/label/input
+    Sleep    3
+    弹框校验    已开启
+
+2积分抵扣活动-添加2
+    ####进入页面
+    点击菜单链接    微营销
+    Wait Until Page Contains Element    //*[@id="breadcrumbs"]/ul/li    #等待 ‘秒杀活动管理’ 显示
+    ${sub}    Set Variable    积分活动
+    点击菜单链接    ${sub}
+    Sleep    3
+    点击菜单链接    积分抵扣活动
+    Wait Until Page Contains Element    //*[@id="breadcrumbs"]/ul/li    #等待 ‘添加送积分活动’ 显示
+    点击菜单链接    添加抵扣活动
+    Sleep    3
+    ##输入图文标题
+    ${标题}    随机字符    【积分抵扣活动】无限制-    12
+    Input Text    //*[@id="main-container"]/div/div[2]/div[2]/div/div/form/div[1]/div/input    ${标题}
+    Sleep    3
+    #活动时间
+    Select From List By Value    //*[@id="main-container"]/div/div[2]/div[2]/div/div/form/div[2]/div/select    1
+    Sleep    1
+    #活动时间
+    Select From List By Value    //*[@id="main-container"]/div/div[2]/div[2]/div/div/form/div[2]/div/select    1
+    Sleep    3
+    #活动时间
+    ${start}    Get Time    \    NOW+1h
+    ${year}    Get Time    year    NOW
+    ${month}    Get Time    month    NOW
+    ${day}    Get Time    day    NOW+48h
+    ${end}    Set Variable    ${year}-${month}-${day} 10:10:10
+    log    ${end}
+    #开始时间
+    Input Text    //*[@id="start_time"]    ${start}
+    Sleep    2
+    #结束时间
+    Input Text    //*[@id="end_time"]    ${end}
+    #其他地方点击下，隐藏时间
+    Click Element    //*[@id="main-container"]/div/div[2]/div[2]/div/div/form/div[1]/div/input
+    Sleep    2
+    #订单限额
+    Input Text    //*[@id="main-container"]/div/div[2]/div[2]/div/div/form/div[4]/div/input    10
+    Sleep    2
+    #满多少积分送多少元
+    Input Text    //*[@id="main-container"]/div/div[2]/div[2]/div/div/form/div[5]/div/div[1]/input    10
+    Sleep    1
+    Input Text    //*[@id="main-container"]/div/div[2]/div[2]/div/div/form/div[5]/div/div[2]/input    100
+    Sleep    1
+    #抵扣金额
+    Input Text    //*[@id="main-container"]/div/div[2]/div[2]/div/div/form/div[7]/div/input    5
+    : FOR    ${var}    IN RANGE    4
+    \    ${ss}    Evaluate    ${var}+1
+    \    Click Element    //*[@id="main-container"]/div/div[2]/div[2]/div/div/form/div[8]/div[${ss}]/label/input
+    \    Sleep    1
+    #保存
+    Click Element    //*[@id="btnConfirm"]
+    Sleep    3
+    弹框校验
+    #开启状态
+    Wait Until Page Contains Element    //*[@id="breadcrumbs"]/ul/li    #等待 ‘积分活动’ 显示
+    Click Element    //*[@id="main-container"]/div/div[2]/div[2]/div/div/div/div/div[1]/form/table/tbody/tr[1]/td[6]/label/input
+    Sleep    3
+    弹框校验    已开启
+
+3积分商城-添加
+    ####进入页面
+    点击菜单链接    微营销
+    Wait Until Page Contains Element    //*[@id="breadcrumbs"]/ul/li    #等待 ‘秒杀活动管理’ 显示
+    ${sub}    Set Variable    积分活动
+    点击菜单链接    ${sub}
+    Sleep    3
+    点击菜单链接    积分商城
+    Wait Until Page Contains Element    //*[@id="breadcrumbs"]/ul/li    #等待 ‘添加送积分活动’ 显示
+    点击菜单链接    添加商品
+    Sleep    3
+    ##商品列表
+    Wait Until Page Contains Element    //h4[text()="商品列表"]
+    Click Element    //*[@id="product"]/div[1]/table/tbody[1]/tr[1]
+    Sleep    1
+    Click Element    //*[@id="product"]/div[1]/table/tbody[1]/tr[2]/td/table/tbody/tr[2]/td[1]/label/input
+    #确定
+    Click Element    //*[@id="main-container"]/div/div[3]/div/div/div[3]/a[2]
+    Sleep    3
+    #换购积分
+    Input Text    //*[@id="main-container"]/div/div[2]/div[2]/div/div/div/div/div/div[5]/form/table/tbody/tr/td[5]/input    10
+    Sleep    1
+    #配额
+    Input Text    //*[@id="main-container"]/div/div[2]/div[2]/div/div/div/div/div/div[5]/form/table/tbody/tr/td[6]/input    1
+    Sleep    1
+    #设置限购
+    Input Text    //*[@id="main-container"]/div/div[2]/div[2]/div/div/div/div/div/div[5]/form/table/tbody/tr/td[7]/input    1
+    Sleep    1
+    #操作
+    Click Element    //*[@id="main-container"]/div/div[2]/div[2]/div/div/div/div/div/div[5]/form/table/tbody/tr/td[8]/a[1]
+    Sleep    3
+    弹框校验
+    #上架
+    Wait Until Page Contains Element    //*[@id="breadcrumbs"]/ul/li    #等待 ‘积分活动’ 显示
+    Click Element    //*[@id="main-container"]/div/div[2]/div[2]/div/div/div/div/div/div[5]/form/table/tbody/tr/td[9]/label/input
+    Sleep    3
+    弹框校验    已上架
+
+商城红包-添加
+    ####进入页面
+    点击菜单链接    微营销
+    Wait Until Page Contains Element    //*[@id="breadcrumbs"]/ul/li    #等待 ‘秒杀活动管理’ 显示
+    ${sub}    Set Variable    商城红包
+    点击菜单链接    ${sub}
+    Sleep    3
+    点击菜单链接    红包管理
+    Wait Until Page Contains Element    //*[@id="breadcrumbs"]/ul/li    #等待 ‘添加送积分活动’ 显示
+    点击菜单链接    添加红包
+    Sleep    3
+    ##添加红包
+    Wait Until Page Contains Element    //h4[text()="添加红包"]
+    #红包名称
+    ${名称}    随机字符    【商城红包】    12
+    Input Text    //*[@id="myModal"]/div/div/form/div[2]/div/div/div/div[1]/div/input    ${名称}
+    Sleep    1
+    #红包类型
+    #红包金额
+    Input Text    //*[@id="amount"]    100
+    #订单限额
+    Input Text    //*[@id="orderlimit"]    20
+    #红包有效期
+    #活动时间
+    ${start}    Get Time    \    NOW+1h
+    ${year}    Get Time    year    NOW
+    ${month}    Get Time    month    NOW
+    ${day}    Get Time    day    NOW+48h
+    ${end}    Set Variable    ${year}-${month}-${day} 10:10:10
+    log    ${end}
+    #开始时间
+    Input Text    //*[@id="start_time"]    ${start}
+    Sleep    2
+    #结束时间
+    Input Text    //*[@id="end_time"]    ${end}
+    #其他地方点击下，隐藏时间
+    Click Element    //*[@id="orderlimit"]
+    Sleep    2
+    #备注说明
+    ${random}    Generate Random String    50
+    Input Text    //*[@id="myModal"]/div/div/form/div[2]/div/div/div/div[6]/div/textarea    ${random}
+    Sleep    2
+    #确定
+    Click Element    //*[@id="btnConfirm"]
+    Sleep    2
+    弹框校验
+
+商城红包活动-添加
+    ####进入页面
+    点击菜单链接    微营销
+    Wait Until Page Contains Element    //*[@id="breadcrumbs"]/ul/li    #等待 ‘秒杀活动管理’ 显示
+    ${sub}    Set Variable    商城红包
+    点击菜单链接    ${sub}
+    Wait Until Page Contains Element    //*[@id="breadcrumbs"]/ul/li    #等待 ‘添加送积分活动’ 显示
+    点击菜单链接    新增活动
+    Sleep    3
+    ##添加活动
+    #标题
+    ${标题}    随机字符    【红包活动】    12
+    Input Text    //*[@id="main-container"]/div/div[2]/div[2]/div/div/div[2]/div/div[2]/form/div[1]/div/input    ${标题}
+    Sleep    1
+    #摘要内容
+    ${random}    Generate Random String    50
+    Input Text    //*[@id="form-field-8"]    ${random}
+    Sleep    1
+    #活动图片
+    选择图片    //*[@id="main-container"]/div/div[2]/div[2]/div/div/div[2]/div/div[2]/form/div[3]/div/div/a/label    //*[@id="submitImage"]
+    Sleep    3
+    #下一步
+    Click Element    //*[@id="modal-footer"]/a[3]
+    #活动名称
+    Input Text    //*[@id="main-container"]/div/div[2]/div[2]/div/div/div[3]/form/div[1]/div/input    ${标题}
+    Sleep    1
+    #选择红包
+    Click Element    //*[@id="main-container"]/div/div[2]/div[2]/div/div/div[3]/form/div[3]/div/div/a
+    Sleep    2
+    ${count}    Get Matching Xpath Count    //*[@id="redPaceModal"]/div/div/table/tbody/tr
+    ${sum}    Evaluate    ${count}-1
+    Pass Execution If    ${sum}==0    没有红包，退出！
+    ${rand}    Evaluate    random.randint(1,${sum})    modules=random
+    Click Element    //*[@id="redPaceModal"]/div/div/table/tbody/tr[${rand}]/td[1]/label/input
+    Sleep    2
+    #确定
+    Click Element    //*[@id="redPackModal"]/div/div/div/a[2]
+    Sleep    2
+    #多少人瓜分
+    Input Text    //*[@id="numperpacket"]    3
+    #生成数量
+    Input Text    //*[@id="main-container"]/div/div[2]/div[2]/div/div/div[3]/form/div[6]/div/input    2
+    #活动时间
+    ${start}    Get Time    \    NOW+1h
+    ${year}    Get Time    year    NOW
+    ${month}    Get Time    month    NOW
+    ${day}    Get Time    day    NOW+48h
+    ${end}    Set Variable    ${year}-${month}-${day} 10:10:10
+    log    ${end}
+    #开始时间
+    Input Text    //*[@id="start_time"]    ${start}
+    Sleep    2
+    #结束时间
+    Input Text    //*[@id="end_time"]    ${end}
+    #其他地方点击下，隐藏时间
+    Click Element    //*[@id="numperpacket"]
+    Sleep    2
+    #保存并关闭
+    Click Element    //*[@id="btnSave"]
+    Sleep    2
+    弹框校验
+
+卡卷活动-添加
+
+*** Keywords ***
+选择图片
+    [Arguments]    ${选择按钮}    ${确定按钮}
+    ####选择图
+    Click Element    ${选择按钮}
+    Sleep    3
+    ${len}    Get Matching Xpath Count    //*[@id="select_ajax_form"]/div[3]/div/ul/li
+    ${图片}    Evaluate    random.randint(1,${len})    random
+    Sleep    2
+    Click Element    //*[@id="select_ajax_form"]/div[3]/div/ul/li[${图片}]
+    Sleep    2
+    Click Element    ${确定按钮}

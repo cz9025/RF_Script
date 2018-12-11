@@ -1,0 +1,128 @@
+*** Settings ***
+Suite Setup       登录
+Suite Teardown    关闭浏览器
+Test Teardown
+Library           Selenium2Library
+Resource          ../Resources/常用操作.txt
+Resource          ../Resources/系统配置.txt
+Resource          ../Resources/BaseData.txt
+
+*** Test Cases ***
+修改用户
+    Comment    点击账号管理
+    Wait Until Page Contains Element    xpath=//span[text()="账号管理"]
+    Click Element    xpath=//span[text()="账号管理"]
+    等待时间    1
+    Comment    点击前台用户管理
+    Click Element    xpath=//p[text()="前台用户管理"]
+    等待时间    3
+    Comment    先要判断用户是否有足够的金币    大于1000才能修改    要改，先放着
+    ${gold}    Get Text    //div[@class="tableList"]/div[1]/table/tbody/tr[1]/td[@ng-show="qtStatus.yhgl_jb"]
+    Comment    Run Keyword If    ${gold}>=1000    ${EMPTY}
+    ...    ELSE
+    Focus    //div[@class="tableList"]/div[1]/table/tbody/tr[1]/td[last()]/a[1]
+    等待时间    1
+    Comment    点击修改
+    Click Element    //div[@class="tableList"]/div[1]/table/tbody/tr[1]/td[last()]/a[1]
+    等待时间    2
+    Comment    昵称
+    ${昵称}    随机字符    ${nick.a}    7
+    Input Text    //input[@name="nickName"]    ${昵称}
+    等待时间    1
+    Comment    VIP等级
+    ${vip}    随机数    0    10
+    ${v}    Generate Random String    1    [NUMBERS]
+    Select From List By Value    //select[@ng-model="courseToEditQ.vip"]    ${v}
+    等待时间    1
+    Comment    用户等级
+    Select From List By Value    //select[@ng-model="courseToEditQ.level"]    2
+    等待时间    1
+    Comment    保存
+    Click Element    xpath=//button[@class="save"]
+    等待时间    3
+    Reload Page
+    等待时间    5
+    Set Screenshot Directory    E:\\result
+    Capture Page Screenshot    前台用户列表-{index}.png
+    ${txt}    Get Text    //div[@class="tableList"]/div[1]/table/tbody/tr[1]/td[2]
+    Run Keyword If    '${昵称}'=='${txt}'    log    修改成功！
+    ...    ELSE    log    修改失败！
+    等待时间    2
+    #最好查询数据库字段一一对比
+
+查询-帐号
+    Comment    先刷新页面    不然再次点击左侧列表会隐藏
+    Reload Page
+    Comment    点击账号管理
+    Wait Until Page Contains Element    xpath=//span[text()="账号管理"]
+    Click Element    xpath=//span[text()="账号管理"]
+    等待时间    1
+    Comment    点击前台用户管理
+    Click Element    xpath=//p[text()="前台用户管理"]
+    等待时间    3
+    ${txt}    Get Text    //div[@class="tableList"]/div[1]/table/tbody/tr[1]/td[1]
+    等待时间    1
+    Comment    选择查询类型
+    Select From List By Value    id=qtType    byAccount
+    等待时间    1
+    Input Text    //input[@ng-model="qtType.accOrnName"]    ${txt}
+    等待时间    1
+    Comment    点击查询
+    Click Button    //button[text()="查询"]
+    等待时间    2
+    ${datas}    Get Matching Xpath Count    //div[@class="tableList"]//table/tbody/tr
+    Run Keyword If    ${datas}==1    log    success!!!
+
+查询-昵称
+    Comment    先刷新页面    不然再次点击左侧列表会隐藏
+    Reload Page
+    Comment    点击账号管理
+    Wait Until Page Contains Element    xpath=//span[text()="账号管理"]
+    Click Element    xpath=//span[text()="账号管理"]
+    等待时间    1
+    Comment    点击前台用户管理
+    Click Element    xpath=//p[text()="前台用户管理"]
+    等待时间    3
+    ${txt}    Get Text    //div[@class="tableList"]/div[1]/table/tbody/tr[1]/td[2]
+    等待时间    1
+    Comment    选择查询类型
+    Select From List By Value    id=qtType    byNickName
+    等待时间    1
+    Input Text    //input[@ng-model="qtType.accOrnName"]    ${txt}
+    等待时间    1
+    Comment    点击查询
+    Click Button    //button[text()="查询"]
+    等待时间    2
+    ${datas}    Get Matching Xpath Count    //div[@class="tableList"]//table/tbody/tr
+    Run Keyword If    ${datas}==1    log    success!!!
+
+删除用户
+    [Tags]
+    log    跳过删除前台用户
+    Comment    删除前台用户
+
+*** Keywords ***
+删除前台用户
+    Comment    先刷新页面    不然再次点击左侧列表会隐藏
+    Reload Page
+    Comment    点击账号管理
+    Wait Until Page Contains Element    xpath=//span[text()="账号管理"]
+    Click Element    xpath=//span[text()="账号管理"]
+    等待时间    1
+    Comment    点击前台用户管理
+    Click Element    xpath=//p[text()="前台用户管理"]
+    等待时间    3
+    ${txt}    Get Text    //div[@class="tableList"]/div[1]/table/tbody/tr[1]/td[1]
+    等待时间    1
+    Focus    //div[@class="tableList"]/div[1]/table/tbody/tr[1]/td[last()]/a[2]
+    等待时间    1
+    Comment    点击删除
+    Click Element    //div[@class="tableList"]/div[1]/table/tbody/tr[1]/td[last()]/a[2]
+    等待时间    2
+    Click Element    xpath=//div[@class="delete"]/div[2]/button[2]
+    等待时间    2
+    Reload Page
+    等待时间    5
+    ${txt2}    Get Text    //div[@class="tableList"]/div[1]/table/tbody/tr[1]/td[1]
+    Run Keyword If    "${txt}"!="${txt2}"    log    删除成功
+    等待时间    5

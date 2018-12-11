@@ -1,0 +1,59 @@
+*** Settings ***
+Library           AppiumLibrary
+Library           Screenshot
+
+*** Variables ***
+${package}        com.dvproject.qdm    # 包名
+${phone}          15815852668    # 帐号，手机号
+${pwd}            123456    # 密码
+
+*** Keywords ***
+安装
+    Set Appium Timeout    20
+    #华为X1
+    #    resetKeyboard=True屏蔽软键盘    unicodeKeyboard=True使用unicode编码方式发送字符串    5b556707
+    Open Application    http://localhost:4723/wd/hub    platformName=Android    platformVersion=6.0.1    deviceName=5b556707    app=${CURDIR}/qdm_debug.apk    unicodeKeyboard=True
+    ...    resetKeyboard=True
+    Sleep    10
+    Wait Until Page Contains    申请入驻    timeout=120    error=NO OPEN APP
+    ${activity}    Get Activity
+    Sleep    2
+    关闭APP
+
+启动APP
+    Set Appium Timeout    20
+    #华为X1
+    #    resetKeyboard=True屏蔽软键盘    unicodeKeyboard=True使用unicode编码方式发送字符串    app=${CURDIR}/qdm_debug.apk
+    Open Application    http://127.0.0.1:4723/wd/hub    platformName=Android    platformVersion=6.0.1    deviceName=6R2QAX1452004560    appPackage=com.dvproject.qdm    appActivity=com.dvproject.qdm.activity.WelcomeActivity
+    ...    unicodeKeyboard=True    resetKeyboard=True
+    Sleep    5
+    ${activity}    Get Activity
+    #Start Activity    appPackage=com.dvproject.qdm    appActivity=com.dvproject.qdm.activity.LoginActivity
+    Sleep    5
+    #登录APP
+
+关闭APP
+    Close All Applications
+
+移除APP
+    Remove Application    ${package}
+
+登录APP
+    #先要进入登录页面
+    Sleep    1
+    Input Text    com.dvproject.qdm:id/et_personal    ${phone}
+    Sleep    1
+    Input Text    com.dvproject.qdm:id/et_password    ${pwd}
+    Sleep    1
+    Click Element    com.dvproject.qdm:id/bn_login
+    Sleep    1
+    Wait Activity    .activity.MainActivity    60
+
+进入首页
+    Start Activity    ${package}    com.dvproject.qdm.activity.WelcomeActivity
+    Sleep    5
+
+失败截屏
+    #Screenshot.Set Screenshot Directory    ${CURDIR}\
+    Run Keyword If Test Failed    Capture Page Screenshot
+    Sleep    3

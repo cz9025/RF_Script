@@ -1,0 +1,267 @@
+*** Settings ***
+Suite Setup       登录
+Suite Teardown    关闭浏览器
+Test Teardown
+Resource          ../Resource/常用操作.robot
+Resource          ../Resource/配置参数.robot
+Library           Selenium2Library
+Library           AutoItLibrary
+Library           RequestsLibrary
+
+*** Test Cases ***
+添加商品分类
+    点击菜单链接    微店铺
+    Wait Until Page Contains Element    //*[@id="navList"]/li[2]/ul/li[1]/a
+    #商品分类
+    Click Element    //*[@id="navList"]/li[2]/ul/li[2]/a
+    Sleep    3
+    #点击添加一级分类
+    Click Element    //*[@id="main-container"]/div[1]/div[2]/div[2]/div/div/div[1]/a
+    Wait Until Page Contains Element    //h4[text()="添加一级分类:"]
+    Sleep    1
+    ${yiji}    随机字符    【第一级】    10
+    Input Text    name=kuyName0    ${yiji}
+    Sleep    1
+    #保存
+    Click Element    //*[@id="addclassification"]/div/div/div[2]/div/div/div/div/button[2]
+    Sleep    3
+    弹框校验
+    Sleep    3
+    #添加第二级分类
+    Click Element    //*[@id="tree"]/div/li[1]/div/div[6]/a[1]/i
+    Wait Until Page Contains Element    //h4[text()="添加二级分类:"]
+    Sleep    1
+    ${erji}    随机字符    【第二级】    10
+    Input Text    name=kuyName1    ${erji}
+    Sleep    1
+    #保存	\	\ \
+    Click Element    //*[@id="addclassification"]/div/div/div[2]/div/div/div/div/button[2]
+    Sleep    3
+    弹框校验
+    #添加第三级分类
+    #展开第一级
+    Click Element    //*[@id="tree"]/div/li[1]/span
+    Sleep    1
+    #添加
+    Click Element    //*[@id="tree"]/div/li[1]/ul/li/div/div[6]/a[1]/i
+    Wait Until Page Contains Element    //h4[text()="添加三级分类:"]
+    Sleep    1
+    ${sanji}    随机字符    【第三级】    10
+    Input Text    name=kuyName2    ${sanji}
+    Sleep    1
+    #保存
+    Click Element    //*[@id="addclassification"]/div/div/div[2]/div/div/div/div/button[2]
+    Sleep    3
+    弹框校验
+    Sleep    3
+    #校验
+    Page Should Contain    ${yiji}
+    #展开第一级
+    Click Element    //*[@id="tree"]/div/li[1]/span
+    Sleep    1
+    Page Should Contain    ${erji}
+    #展开第二级
+    Click Element    //*[@id="tree"]/div/li[1]/ul/li/span
+    Sleep    1
+    Page Should Contain    ${sanji}
+
+添加商品
+    点击菜单链接    微店铺
+    Wait Until Page Contains Element    //*[@id="navList"]/li[2]/ul/li[1]/a
+    #商品列表
+    Click Element    //*[@id="navList"]/li[2]/ul/li[1]/a
+    #获取未添加商品前商品的总数
+    sleep    3
+    ${商品名称}    随机字符    【凑数商品】    15
+    ${销售量上限}    Set Variable    99
+    ${销售量}    Evaluate    random.randint(0,${销售量上限})    random
+    ${商品详情}    Set Variable    测试商品，内容随意填写
+    ${产品重量}    Set Variable    100
+    ${每人限购}    Set Variable    0
+    ${排序}    Set Variable    0
+    ${商品数}    Get Text    //*[@id="main-container"]/div[1]/div[2]/div[2]/div/div[2]/div[1]/div/form/div[1]/div[1]/div[2]/a
+    ${商品数加1}    Evaluate    int(${商品数}+1)
+    log    ${商品数加1}
+    Sleep    3
+    点击菜单链接    添加商品
+    等待时间    3
+    #商品分类选择
+    随机下拉选择框    //tbody/tr[1]/td[2]/div[1]/select
+    等待时间    1
+    随机选择下拉框    //tbody/tr[1]/td[2]/div[2]/select
+    等待时间    1
+    随机选择下拉框    //tbody/tr[1]/td[2]/div[3]/select
+    等待时间    0.5
+    Input Text    xpath=//input[@ng-model="product.name"]    ${商品名称}
+    Input Text    xpath=//input[@ng-model="product.sales"]    ${销售量}    #随机输入一个销售量（0-9999999）
+    等待时间    0.5
+    #添加图片广告
+    Click Element    xpath=//div/a/label[@data-title="选择"]
+    sleep    3
+    ${图片数}    Get Matching Xpath Count    //*[@id="select_ajax_form"]/div[3]/div/ul/li    #获取当前页面图片数
+    log    ${图片数}
+    sleep    1
+    ${随机图}    Evaluate    random.randint(1,${图片数})    random
+    Wait Until Page Contains Element    //*[@id="select_ajax_form"]/div[3]/div/ul/li[${随机图}]/a/img    10s
+    #Click Element    //*[@id="select_ajax_form"]/div[3]/div/ul/li[1]/a/img    #选取第一张图片，随机选择图片，下面语句取消注释即可
+    Click Element    //*[@id="select_ajax_form"]/div[3]/div/ul/li[${随机图}]/a/img    #随机选取一张图片
+    sleep    1
+    Click Element    id=submitImage    #确认选择的图片
+    sleep    0.5
+    随机选择下拉框    //tbody/tr[9]/td[2]/div/select    #随机选择一个库存规格
+    sleep    1
+    ${规格数}    Get Matching Xpath Count    xpath=//tbody/tr[9]/td[2]/div/div[3]/div/ul/*
+    log    ${规格数}
+    ${y}    Run Keyword If    ${规格数}>0    Evaluate    random.randint(1,${规格数})    random
+    ...    ELSE    Evaluate    1
+    #以下步骤是库存规则，选择的下拉规格中规格值为空，则新增一个规格值，然后输入规格参数，否则直接输入规格参数
+    sleep    0.5
+    Run Keyword If    ${规格数}>0    商品规格    xpath=//table/tbody/tr[9]/td[2]/div/div[3]/div/ul/li[${y}]/input
+    ...    ELSE    添加规格值    xpath=//div/a[@class="btn btn-xs btn-primary margin-left20"]/i
+    sleep    0.5
+    Click Element    //*[text()="下一步"]
+    sleep    1
+    Input Text    name=weigh    ${产品重量}    #产品重量
+    Input Text    name=buy    ${每人限购}    #每人限购
+    Input Text    name=sort    ${排序}    #排序
+    Select Frame    id=ueditor_0    #商品详情
+    sleep    0.5
+    Input Text    xpath=//body    ${商品详情}    #输入内容
+    Unselect Frame
+    sleep    0.3
+    Click Element    //div/div[@ng-show="taba==2"]/a[2]
+    弹框校验    添加成功
+    sleep    1
+    #以下步骤预期结果校验
+    Wait Until Element Contains    xpath=//form/div[1]/div[1]/div[2]/div    商品数
+    ${商品数2}    Get Text    xpath=//form/div[1]/div[1]/div[2]/a
+    log    ${商品数2}
+    Run Keyword If    '${商品数2}'=='${商品数加1}'    log    列表中已正确添加一件商品，商品数量正确
+    ...    ELSE    fail    列表中未添加商品，商品数量未发生变化
+    sleep    0.5
+    搜索    ${商品名称}
+    字段校验    //tbody/tr[1]/td[2]/div/span[@ng-bind="list.name"]    ${商品名称}    #商品名称校验
+    字段校验    //tbody/tr[1]/td[4]/span[@ng-bind="list.reserves"]    100    #商品库存校验
+    字段校验    //tbody/tr[1]/td[@ng-bind="list.sales"]    ${销售量}    #商品销量校验
+    sleep    2
+    #还原初始数据（删除添加的商品）
+    #商品删除    ${商品名称}
+    #商品上架
+    Click Element    //*[@id="main-container"]/div[1]/div[2]/div[2]/div/div[2]/div[4]/table/tbody/tr[1]/td[7]/label/input
+    sleep    3
+    Confirm Action
+
+商品规格-添加-单
+    点击菜单链接    微店铺
+    Wait Until Page Contains Element    //*[@id="navList"]/li[2]/ul/li[1]/a
+    #商品规格
+    Click Element    //*[@id="navList"]/li[2]/ul/li[3]/a
+    Sleep    3
+    #添加规格
+    Click Element    //*[@id="main-container"]/div[1]/div[2]/div[2]/div/div/div[1]/ul/li/a
+    Sleep    2
+    ${规格名称}    随机字符    【规格名称】    8
+    Input Text    name=kuyName    ${规格名称}
+    #规格值
+    Sleep    1
+    ${规格值}    随机字符    【规格值】    8
+    Input Text    name=name0    ${规格值}
+    Sleep    1
+    #保存
+    Click Element    //*[@id="addcomments"]/div/div/div[2]/div/div/div/div/button[2]
+    Sleep    3
+    弹框校验
+
+*** Keywords ***
+随机选择下拉框
+    [Arguments]    ${path}
+    Click Element    xpath=${path}
+    等待时间    1
+    ${count}    Get Matching Xpath Count    xpath=${path}/option    #获取总数
+    log    ${count}
+    sleep    0.5
+    #${j}    Evaluate    random.randint(1,${count})    random
+    : FOR    ${i}    IN RANGE    10
+    \    ${j}    Evaluate    random.randint(1,${count})    random
+    \    Run Keyword If    ${j}!=1    Exit For Loop
+    Run Keyword If    ${count}>1    Click Element    xpath=${path}/option[${j}]
+    ...    ELSE    Click Element    xpath=${path}/option[1]
+    ${title}    Get Text    xpath=${path}/option[${j}]
+    log    ${title}
+    [Return]    ${title}
+
+商品规格
+    [Arguments]    ${勾选商品规格路径}    ${库存}=100    ${原价}=100    ${零售价}=0.01    ${商家编码}=000001
+    Sleep    1s
+    ${条形码}    Evaluate    random.randint(10000,99999)    random    #随机选择一个条形码
+    Click Element    ${勾选商品规格路径}
+    Sleep    0.5s
+    Input Text    name=reserves    ${库存}    #库存
+    Input Text    name=market_price0    ${原价}    #原价
+    Input Text    name=retail_price0    ${零售价}    #零售价
+    Input Text    name=sku_no    ${商家编码}    #商家编码
+    Sleep    0.5s
+    Input Text    name=barcode    ${条形码}    #条形码
+    Sleep    0.5s
+    Click Element    name=status    #状态
+    Sleep    0.5s
+
+添加规格值
+    [Arguments]    ${规格值路径}
+    Click Element    ${规格值路径}
+    Sleep    1
+    ${规格值}    随机字符    【规格值】    10
+    Input Text    id=kindChildName    ${规格值}
+    Sleep    1s
+    Click Element    xpath=//div[@class="modal-footer"]/a[text()="确定"]
+    弹出窗信息校验    添加成功！
+    商品规格    xpath=//table/tbody/tr[9]/td[2]/div/div[3]/div/ul/li/input
+    Sleep    0.5
+    [Return]    ${规格值}
+
+添加商品链接
+    click element    //*[@id="main-container"]/div[1]/div[2]/div[2]/div/div[2]/div[2]/div/ul/li[1]/a
+    Sleep    0.5
+    Wait Until Page Contains Element    xpath=//*[@id="main-container"]/div[3]/div/div/div[3]/a[2]    5
+    click element    xpath=//*[@id="main-container"]/div[3]/div/div/div[3]/a[2]    #点击确定按钮
+    等待时间    1
+    Wait Until Page Contains Element    id=post    5
+    Click Element    id=post
+    等待时间    0.5
+    confirm action
+    等待时间    1    #删除数据，还原初始状态    #${number}    Get Text    //*[@id="main-container"]/div[1]/div[2]/div[2]/div/div/div[4]/ul[2]/li[3]/span/span    #Click Element
+    ...    # xpath=//*[@id="main-container"]/div[1]/div[2]/div[2]/div/div/div[3]/table/tbody/tr[1]/td[7]/div/a[2]/i    #点击删除按钮    #等待时间    1    #Click Element    xpath=//tbody/tr[3]/td/div[2]/button[1]
+    ...    #确认删除    #等待时间    1    #confirm action    #等待时间    2
+    ...    #${i}    Set Variable    1    #${sum}    Set Variable    0
+    ...    #${number1}    Get Text    //*[@id="main-container"]/div[1]/div[2]/div[2]/div/div/div[4]/ul[2]/li[3]/span/span    #${sum}    Evaluate    ${number}-${i}
+    ...    #Run Keyword If    '${sum}'=='${number1}'    log    删除后校验通过    # ELSE    log
+    ...    # 删除后校验失败
+
+搜索
+    [Arguments]    ${商品名称}
+    Input Text    xpath=//div/input[@ng-model="searchName"]    ${商品名称}
+    sleep    0.3
+    Click Element    xpath=//*[@id="main-container"]/div[1]/div[2]/div[2]/div/div/div[1]/div/form/div[2]/div/div/div[2]/span/a/i
+    sleep    1
+
+字段校验
+    [Arguments]    ${xpath}    ${校验字段}
+    ###结果校验
+    Log    ----结果校验----
+    ${校验字段2}    Get Text    ${xpath}
+    Should Be Equal As Strings    ${校验字段}    ${校验字段2}
+    Log    Sucess!
+
+随机下拉选择框
+    [Arguments]    ${path}
+    Click Element    xpath=${path}
+    等待时间    2
+    ${count}    Get Matching Xpath Count    xpath=${path}/option    #获取总数
+    log    ${count}
+    sleep    0.5
+    ${j}    Evaluate    random.randint(1,${count})    random
+    Run Keyword If    ${count}>1    Click Element    xpath=${path}/option[${j}]
+    ...    ELSE    Click Element    xpath=${path}/option[1]
+    ${title}    Get Text    xpath=${path}/option[${j}]
+    log    ${title}
+    [Return]    ${title}

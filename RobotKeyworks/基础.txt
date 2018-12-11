@@ -1,0 +1,232 @@
+*** Settings ***
+Library           String
+Library           Selenium2Library
+Resource          Resource/选择数据.txt
+Resource          baidu.robot
+Library           Collections
+
+*** Test Cases ***
+screenshot
+    Open Browser    http://www.baidu.com    gc
+    Maximize Browser Window
+    sleep    5
+    Input Text    id=kw    cz9025
+    Click Element    id=su
+    sleep    5
+    Log    ScreenShot testing
+    #设置截图保存的路劲    及名字
+    Set Screenshot Directory    E:\result
+    Capture Page Screenshot    1.png
+    sleep    2
+    Close All Browsers
+
+创建随机字符串
+    ${len}    Set Variable    12
+    ${pre}    Set Variable    【测试字符】
+    ${prelen}    Get Length    ${pre}
+    #计算表达式的值
+    ${randlen}    Evaluate    ${len}-${prelen}
+    #随机生成的字符
+    ${rand}    Generate Random String    ${randlen}
+    ${randstr}    Set Variable    ${rand}
+    log    str:::${pre}${randstr}
+    log    ================
+    ${xulie}    Generate Random String    8    01
+    log    ${xulie}
+    log    =======================
+    ${ces}    随机字符    【测试字符】    12
+    log    ${ces}
+
+随机选择数据
+    ${list}    Create List    湖南    广东    广西    广北    广南
+    ${len}    Get Length    ${list}
+    #可以取到头和尾
+    ${rand}    Evaluate    random.randint(0, ${len})    modules=random, sys
+    log    list:::${list[${rand}]}
+    #前面固定部分    后面还加字符以示区别
+    ${str}    Generate Random String    5
+    ${name}    Set Variable    【测试】${list[${rand}]}${str}
+    随机数据
+    #########
+    ${rand}    Evaluate    random.randint(1000000000, 9999999999)    random
+    log    ssssssssss:::${rand}
+
+重复执行
+    #重复执行关键字    执行5次
+    Repeat Keyword    5    随机字符    【测试数据】    10
+
+拖动滚动条
+    百度搜索    cz9025
+    Sleep    2
+    #向下拖动滚动条    这个希望能做到缓慢拖动就好了
+    Execute Javascript    document.body.scrollTop=1000
+    Sleep    5
+    Close All Browsers
+    #向右滚动    document.body.scrollWidth=1000
+
+正则
+    ${content}    Set Variable    http://www.baidu.com http://www.baidu.com
+    ${res}    Should Match Regexp    ${content}    www.*?\\.com
+    log    ${res}
+    ${res}    Should Match Regexp    ${content}    \\Ah\\w+
+    log    ${res}
+    ${res}    Evaluate    re.findall(r'www.*?\.com','${content}')    modules=re    #变量要加引号
+    log    ${res}
+    #获取数字
+    ${s}    Set Variable    订单总数：18
+    ${value}    Evaluate    re.findall("\\d+",'${s}')    modules=re
+    log    ${value}
+
+切换窗口
+    Open Browser    http://www.baidu.com    chrome    #1br
+    Maximize Browser Window
+    Wait Until Page Contains Element    kw
+    Input Text    kw    cz9025
+    Sleep    1
+    Click Element    su
+    #第一条搜索结果
+    Wait Until Page Contains Element    //div[@id='content_left']/div[1]/h3/a
+    Click Element    //div[@id='content_left']/div[1]/h3/a
+    Sleep    5
+    ${titles}    Get Window Titles
+    ${titles2}    Get From List    ${titles}    1
+    ${titles1}    Get From List    ${titles}    0
+    #切换到第二个窗口
+    Comment    Select Window    title=${titles2}
+    Comment    Sleep    2
+    Comment    ${ti}    Get Title
+    Comment    Page Should Contain Element    //*[@id="codeform"]/div/div/div[2]/button
+    Comment    Sleep    1
+    #切换回第一个窗口    点击链接后就已经是在第二个窗口了
+    Select Window    title=${titles1}
+    Sleep    1
+    Page Should Contain Element    id=kw
+    Clear Element Text    id=kw
+    Sleep    1
+    Input Text    id=kw    robot
+    Click Element    id=su
+    #只会关闭当前的窗口
+    Sleep    5
+    Close Window
+
+添加缓存
+    #    添加缓存实现自动登录
+    Open Browser    http://www.MK.com/    chrome
+    Maximize Browser Window
+    Set Browser Implicit Wait    20
+    Sleep    4
+    ${cook}    Get Cookies
+    log    ${cook}
+    Sleep    3
+    Add Cookie    apsid    EzYzMyYWY1YjI1OGMxMzMxODc3OWQwNTM0MjQzYjgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMzA3NzA0NgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABjejkwMjVAMTYzLmNvbQAAAAAAAAAAAAAAAAAAAAAAAGFjZDZmN2Q1Yzc2YTM2ZDhmMDEwOWM4ZmZlNzUzMTVl3cDgWN3A4Fg%3DYm
+    Add Cookie    last_login_username    cz9025%40163.com
+    Add Cookie    loginstate    1
+    Comment    添加缓存后要刷新才能看到效果
+    Reload Page
+    Sleep    3
+    ${cook}    Get Cookies
+    log    ${cook}
+    Close All Browsers
+
+用evaluate删除文件
+    #删除文件
+    ${a}    evaluate    os.system(r'del E:\\robotresult\\report1.html')    os
+    #删除文件夹
+    ${a}    evaluate    os.system(r'rd E:\\robotresult\\qq')    os
+
+判断选择哪个值
+    #这种可用于判断选择哪种版本
+    ${flag}    Set Variable    qqq
+    Run Keyword If    '${flag}'=='qqq'    随机字符    qwe    12
+    ...    ELSE    log    '111'
+    Comment    ====================
+    ${arg1}    Set Variable    test12
+    ${arg}    Run Keyword If    '${arg1}'=='test'    Set Variable    this is test
+    ...    ELSE IF    '${arg1}'=='test1'    Set Variable    errorsss
+    ...    ELSE    fail    参数错误
+    log    ${arg}
+
+终止用例执行
+    ${value}    Set Variable    hello
+    #    可以提前结束用例的执行
+    Run Keyword If    '${value}'=='hello'    Pass Execution    OK
+    log    hhh
+
+鼠标悬停
+    Open Browser    ${baidu}    chrome
+    Maximize Browser Window
+    Wait Until Page Contains Element    //div[@id="u1"]/a[8]
+    #把鼠标停留在元素的上面
+    Mouse Over    //div[@id="u1"]/a[8]
+    #在弹出的列表中点击元素
+    Click Element    //div[@class="bdpfmenu"]/a[1]
+    Sleep    5
+    Close All Browsers
+
+嵌套循环
+    ${a}    Create List    a1    a2    a3    a4
+    ${b}    Create List    b1    b2    b3    b4
+    ${c}    Create List    c1    c2    c3    c4
+    @{listtest}    Create List    ${a}    ${b}    ${c}
+    : FOR    ${li}    IN    @{listtest}
+    \    log    ${li}
+    \    内嵌FOR    @{li}
+    : FOR    ${i}    IN RANGE    10
+    \    log    ${i}
+    Comment    @是可迭代的
+    : FOR    ${i}    IN    @{a}
+    \    Log Many    ${i}
+    #1234
+    ${size}    Evaluate    5
+    : FOR    ${i}    IN RANGE    1    ${size}
+    \    log    ${i}
+    #1234
+    : FOR    ${li}    IN    1    2    3    4
+    \    log    ${li}
+    #13579
+    : FOR    ${i}    IN RANGE    1    10    2
+    \    log    ${i}
+
+获取当前浏览器的宽高
+    Open Browser    http://www.baidu.com    gc
+    Maximize Browser Window
+    Sleep    3
+    ${width}    ${height}    Get Window Size
+    log    ${width}
+    log    ${height}
+    Sleep    2
+    Close All Browsers
+
+if其他用法
+    ${var}    Set Variable    1234
+    Run Keyword If    ${var}=="1234"    log    1
+    ...    ELSE IF    ${var}==1234    log    2
+    ...    ELSE    log    3
+    Comment    数字变量
+    log    ${123}
+    ${num}    Set Variable    ${123}
+    log    ${num}
+
+jquery定位
+    Open Browser    http://www.baidu.com    gc
+    Maximize Browser Window
+    #用jquery定位
+    #应该是不用写$()    待测试
+    Wait Until Page Contains Element    jquery=input:eq(7)
+    Input Text    jquery=input:eq(7)    cz9025
+    Sleep    5
+    Close All Browsers
+
+*** Keywords ***
+随机字符
+    [Arguments]    ${str}    ${lens}
+    ${pre}    Get Length    ${str}
+    ${prelen}    Evaluate    ${lens}-${pre}
+    ${rand}    Generate Random String    ${prelen}
+    ${randstr}    Set Variable    ${str}${rand}
+    [Return]    ${randstr}
+
+内嵌FOR
+    [Arguments]    @{lis}
+    : FOR    ${abc}    IN    @{lis}
+    \    Log Many    ${abc}

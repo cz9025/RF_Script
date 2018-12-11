@@ -1,0 +1,55 @@
+*** Settings ***
+Library           String
+
+*** Test Cases ***
+全部
+    #将大写转换为小写
+    ${str1}    Convert To Lowercase    ABCD
+    log    ${str1}
+    #将小写转换为大写
+    ${str2}    Convert To Uppercase    asdfg
+    log    ${str2}
+    #将字节类型转换为字符串
+    ${str}    Decode Bytes To String    123    UTF-8
+    log    ${str}
+    #将字符串转换wield字节类型
+    ${bytes}    Encode String To Bytes    asdfgh    UTF-8
+    log    ${bytes}
+    #切割，只要左边的部分
+    ${xxx}    Fetch From Left    asdfgh    d
+    log    ${xxx}
+    #切割，只要右边的部分
+    ${xxx}    Fetch From Right    asdfgh    d
+    log    ${xxx}
+    #取字符串第几行    从0开始
+    ${first}    Get Line    asdfgh\nqwer    1
+    log    ${first}
+    #获得字符串的行数
+    ${s}    Get Line Count    qwe\nrty\nsdf\nsdfg\nsdfg
+    log    ${s}
+    ####    匹配含有指定字符的
+    ${glcs}    Get Lines Containing String    qwe\nrty\nsdf\nsdfg\nsdfg    q
+    log    ${glcs}
+    #切割字符串    可指定切割哪里
+    ${glmp}    Get Substring    qwenrtynsdfnsdfgnsdfg\na    2
+    log    ${glmp}
+    #移除字符串中指定字符
+    ${str}    Remove String    robot framework    work
+    log    ${str}
+    #将字符串中的指定字符替换为其他字符
+    ${str}    Decode Bytes To String    qwertyuioqwertyuiooo    UTF-8
+    ${replace}    Replace String    ${str}    qwe    QQQ
+    log    ${replace}
+    Should Be Byte String    ${bytes}
+    Should Be Lowercase    ${str}
+    Run Keyword    Should Be Lowercase    qwert
+    Run Keyword    Should Be String    qwertQ
+    #切片    要切的字符串    分隔符    从哪开始
+    @{words}    Split String    qwerty    e    1
+    Log Many    @{words}
+    #按行切片
+    @{lines}    Split To Lines    qwe\nrty\nsdf\nsdfg\nsdfg    0
+    Log Many    @{lines}
+    #去掉两端空格
+    ${strip}    Strip String    ${SPACE}qwe${SPACE}qwe${SPACE}
+    log    ${strip}

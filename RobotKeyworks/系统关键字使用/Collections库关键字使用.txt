@@ -1,0 +1,108 @@
+*** Settings ***
+Library           Collections
+Library           String
+
+*** Test Cases ***
+list相关
+    ${list}    Create List    a    b    c
+    ${a}    Create List    x    y    z
+    ${b}    Create List    u    v    w
+    #在list后面添加元素
+    Append To List    ${list}    d    e    f
+    log    ${list}
+    #把${b}的元素添加到${a}的后面    ${a}和${b}的值不变
+    ${x}    Combine Lists    ${a}    ${b}
+    log    ${x}
+    #将一个可迭代的数转换为列表
+    ${c}    Generate Random String    6
+    ${d}    Convert To List    ${c}
+    log    d:::${d}
+    ${f}    Generate Random String    6    qwertyuioasdfghj
+    log    ${f}
+    #${e}    Convert To Dictionary    ${f}
+    #log    ${e}
+    #复制字典
+    ${g}    Create Dictionary    a=b    c=d    e=f
+    ${h}    Copy Dictionary    ${g}
+    log    h::${h}
+    #复制列表
+    ${i}    Copy List    ${a}
+    log    i::${i}
+    #算出某列表中元素的个数
+    ${k}    Create List    a    b    a    a    b
+    ${l}    Count Values In List    ${k}    a
+    log    ${l}
+    #获得列表索引对应的值
+    ${m}    Get From List    ${a}    1
+    #根据列表的元素值获得索引
+    ${n}    Get Index From List    ${a}    y
+    ##########    get相关了
+    ${测试}    Create List    aasdf    s    d    aerty    c
+    ...    s
+    #找出所有a开头的元素个数    去掉*只找a
+    ${match}    Get Match Count    ${测试}    a*
+    #找出元素
+    ${matchs}    Get Matches    ${测试}    a*
+    #切片2-4    不包含第4个
+    ${slice}    Get Slice From List    ${测试}    2    4
+    #在列表的指定位置处插入元素    在原来的元素前添加
+    Insert Into List    ${a}    0    aa
+    log    aa:${a}
+    ${copylist}    Copy List    ${list}
+    #第二个列表元素是否在第一个列表里面
+    List Should Contain Sub List    ${copylist}    ${list}    原来不想等哦
+    #列表中是否包含该元素值
+    List Should Contain Value    ${copylist}    a    原来没有这个值啊
+    List Should Not Contain Value    ${copylist}    sss    没有这个值是对的
+    #从列表中移除某元素
+    Remove From List    ${copylist}    1
+    Remove Values From List    ${copylist}    b
+    log    ${copylist}
+    #倒置列表
+    Reverse List    ${copylist}
+    Reverse List    ${copylist}
+    log    ${copylist}
+    #将索引1的元素改变为b    替换原来的值
+    Set List Value    ${copylist}    1    b
+    log    ${copylist}
+    #对元素值排序
+    Sort List    ${d}
+    log    ${d}
+
+Dict相关
+    ${dict1}    Create Dictionary    a=b    c=d    e=f
+    ${dict2}    Create Dictionary    a=b    c=d    e=f
+    #比较两个字典是否一样
+    Dictionaries Should Be Equal    ${dict1}    ${dict2}
+    #判断字典中是否存在某个键和值
+    Dictionary Should Contain Item    ${dict1}    a    b
+    #判断字典中是否存在某个键
+    Dictionary Should Contain Key    ${dict1}    a
+    #判断字典中不存在某个键
+    Dictionary Should Not Contain Key    ${dict1}    d
+    #判断字典中不存在某个值
+    Dictionary Should Not Contain Value    ${dict1}    a
+    #获得字典的键
+    ${keys}    Get Dictionary Keys    ${dict1}
+    #获得字典的值
+    ${values}    Get Dictionary Values    ${dict1}
+    #把字典转换为列表形式
+    ${items}    Get Dictionary Items    ${dict1}
+    #在字典中找出某个键的值
+    ${gfd}    Get From Dictionary    ${dict1}    a
+    #字典为现有的    只要输入键就能输出键和值
+    Keep In Dictionary    ${dict1}    a    c    e
+    log    ${dict1}
+    #移除指定的键和对应的值
+    Pop From Dictionary    ${dict1}    a
+    log    ${dict1}
+    Remove From Dictionary    ${dict1}    c
+    log    ${dict1}
+    #在字典后面添加键值
+    Set To Dictionary    ${dict1}    key    11
+    log    :::${dict1}
+    #在字典中添加一个字典
+    ${dictdict}    Create Dictionary    a=1    b={'q':2,'w':3}
+    log    ${dictdict}
+    Set To Dictionary    ${dictdict}    hh    ${dict1}
+    log    ${dictdict}
